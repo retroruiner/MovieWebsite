@@ -25,11 +25,35 @@ public enum Genre {
         this.movies = new ArrayList<>();
     }
 
-    public void addMovie(MovieItem movie) {
-        movies.add(movie);
+    public void addMovie(MovieItem newMovie) {
+        verifyMoviesListExistence();
+        if(!validateIfMovieExists(newMovie)) {
+            this.movies.add(newMovie);
+            newMovie.addGenre(this);
+        }
+
     }
     public void removeMovie(MovieItem movie) {
-        movies.remove(movie);
+        verifyMoviesListExistence();
+        if(validateIfMovieExists(movie)) {
+            this.movies.remove(movie);
+            movie.removeGenre(this);
+        }
+    }
+
+    private boolean validateIfMovieExists(MovieItem movieItem) {
+        for (MovieItem m: movies) {
+            if( m.getId() == movieItem.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void verifyMoviesListExistence() {
+        if(this.movies == null) {
+            this.movies = new ArrayList<>();
+        }
     }
 
 }

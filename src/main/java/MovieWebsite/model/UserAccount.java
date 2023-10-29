@@ -1,6 +1,7 @@
 package MovieWebsite.model;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Setter
 @Getter
+@Builder
 public class UserAccount {
     private int id;
     private String fullName;
@@ -19,41 +21,55 @@ public class UserAccount {
     private String email;
 
     //TODO: Implement hashing algorithm
-    @Getter(AccessLevel.NONE)
-    @Setter(AccessLevel.NONE)
-    private int password;
 
     private List<MovieCollection> listOfCollections;
-    private List<MovieCollection> listOfMovies;
 
-    public UserAccount(UserAccountBuilder builder) {
-        this.fullName = builder.fullName;
-        this.nickname = builder.nickname;
-        this.dateOfBirth = builder.dateOfBirth;
-        this.email = builder.email;
-
-        this.listOfCollections = new ArrayList<>();
-    }
+    private final List<UserAccount> friendList;
 
     public void createNewCollection(String name) {
         listOfCollections.add(new MovieCollection(name));
     }
 
-    public void addMovieToCollection(MovieItem movie, MovieCollection movieCollection) {
-        for (MovieCollection collection: listOfCollections) {
-            if (collection.getName().equals(movieCollection.getName())) {
-                collection.addMovie(movie);
-            }
+    private void verifyCollectionExistence() {
+        if(this.listOfCollections == null) {
+            this.listOfCollections = new ArrayList<>();
         }
     }
 
-    @Accessors(chain = true)
-    @Setter
-    public static class UserAccountBuilder {
-        private int id;
-        private String fullName;
-        private String nickname;
-        private Date dateOfBirth;
-        private String email;
+    public void addMovieToCollection(MovieItem movie, MovieCollection movieCollection) {
+        modifyMovieInCollection(movie, movieCollection, true);
+    }
+
+    public void removeMovieFromCollection(MovieItem movie, MovieCollection movieCollection) {
+        modifyMovieInCollection(movie, movieCollection, false);
+    }
+
+    private void modifyMovieInCollection(MovieItem movie, MovieCollection movieCollection, boolean add) {
+        verifyCollectionExistence();
+        for (MovieCollection collection : listOfCollections) {
+            if (collection.getName().equals(movieCollection.getName())) {
+                if (add) {
+                    collection.addMovie(movie);
+                } else {
+                    collection.removeMovie(movie);
+                }
+                return;
+            }
+        }
+    }
+    public void deleteCollection(MovieCollection movieCollection) {
+        if (listOfCollections.contains(movieCollection)) {
+            listOfCollections.remove(movieCollection);
+        } else {
+            throw new IllegalArgumentException("No such collection found");
+        }
+    }
+
+    public boolean verifyPassword(String password) {
+        if (this.password.equals(password)) {
+            return true; // Password matches
+        } else {
+            throw new IllegalArgumentException("Incorrect password"); // Password does not match
+        }
     }
 }

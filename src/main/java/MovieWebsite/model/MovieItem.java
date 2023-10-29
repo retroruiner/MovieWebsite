@@ -1,8 +1,8 @@
 package MovieWebsite.model;
 
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.Lombok;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -11,48 +11,47 @@ import java.util.Date;
 
 @Getter
 @Setter
-
+@Builder
 public class MovieItem {
     private int id;
     private int duration;
     private float rating;
-    private String name;
+    private String title;
     private String director;
     private String countryOfOrigin;
     private Date releaseDate;
-    private ArrayList<Genre> genreList;
+    private List<Genre> genreList;
 
-    public MovieItem(MovieItemBuilder builder) {
-        this.id = builder.id;
-        this.duration = builder.duration;
-        this.rating = builder.rating;
-        this.name = builder.name;
-        this.director = builder.director;
-        this.countryOfOrigin = builder.countryOfOrigin;
-        this.releaseDate = builder.releaseDate;
-        this.genreList = new ArrayList<>();
-    }
 
     public void addGenre(Genre genre) {
-        this.genreList.add(genre);
-        genre.addMovie(this);
-    }
-
-    @Accessors(chain = true)
-    @Setter
-    public static class MovieItemBuilder {
-        private int id;
-        private int duration;
-        private float rating;
-        private String name;
-        private String director;
-        private String countryOfOrigin;
-        private Date releaseDate;
-
-        public MovieItem build(){
-            return new MovieItem(this);
+        verifyGenreListExistence();
+        if(!validateIfGenreExists(genre)) {
+            this.genreList.add(genre);
+            genre.addMovie(this);
         }
     }
 
+    public void removeGenre(Genre genre) {
+        verifyGenreListExistence();
+        if(validateIfGenreExists(genre)) {
+            this.genreList.remove(genre);
+            genre.removeMovie(this);
+        }
+    }
+
+    private boolean validateIfGenreExists(Genre genre) {
+        for (Genre g: genreList) {
+            if(g == genre){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void verifyGenreListExistence() {
+        if(this.genreList == null) {
+            this.genreList = new ArrayList<>();
+        }
+    }
 }
 

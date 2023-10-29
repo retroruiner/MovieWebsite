@@ -5,8 +5,7 @@ import MovieWebsite.model.MovieItem;
 import java.util.List;
 
 public interface GenreRepository {
-    public void addGenre(String genre);
-    public List<Genre> getAllGenres();
-    public List<MovieItem> getMoviesByGenre(String genre);
-
+    Genre findGenreByName(String name);
+    List<Genre> getAllGenres();
+    List<MovieItem> getMoviesByGenre(String genre);
 }

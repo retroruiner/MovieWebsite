@@ -1,9 +1,9 @@
 package MovieWebsite.model;
-import MovieWebsite.repository.MovieCollectionRepo;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 public class MovieCollection {
@@ -15,10 +15,14 @@ public class MovieCollection {
         this.movies = new ArrayList<>();
     }
     public void addMovie(MovieItem movie) {
-        movies.add(movie);
+        if(!isMovieInCollection(movie)) {
+            movies.add(movie);
+        }
     }
 
     public void removeMovie(MovieItem movie) {
-        movies.remove(movie);
+        if(isMovieInCollection(movie)) {
+            movies.remove(movie);
+        }
     }
 }
