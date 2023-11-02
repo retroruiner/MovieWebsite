@@ -19,6 +19,9 @@ public class UserAccount {
     private String nickname;
     private Date dateOfBirth;
     private String email;
+    private String password;
+    private boolean loggedIn;
+    private String authToken; //TODO: change location of Token, not safe now
 
     //TODO: Implement hashing algorithm
 
