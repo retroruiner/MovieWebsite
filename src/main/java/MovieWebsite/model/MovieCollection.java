@@ -25,4 +25,14 @@ public class MovieCollection {
             movies.remove(movie);
         }
     }
+
+    private boolean isMovieInCollection(MovieItem movie) {
+        for (MovieItem m: movies) {
+            if(Objects.equals(m.getTitle(), movie.getTitle())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public void deleteCollection() { movies.clear();}
 }
