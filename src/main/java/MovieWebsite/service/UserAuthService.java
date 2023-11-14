@@ -3,10 +3,16 @@ package MovieWebsite.service;
 import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.AuthenticationRepository;
 import MovieWebsite.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
+@RequiredArgsConstructor
+@Service
 public class UserAuthService {
-    private UserRepository userRepository;
-    private AuthenticationRepository authenticationRepository;
+    private final UserRepository userRepository;
+    private final AuthenticationRepository authenticationRepository;
 
     public void loginUser(String nickname, String password) {
         UserAccount userAccount = authenticationRepository.authenticateUser(nickname, password);
@@ -22,7 +28,8 @@ public class UserAuthService {
         }
     }
     public void logoutUser(int userId) {
-        UserAccount user = userRepository.findByUserID(userId);
+        Optional<UserAccount> userOptional = userRepository.findById(userId);
+        UserAccount user = userOptional.get();
         if (user != null) {
             String authToken = user.getAuthToken();
             authenticationRepository.invalidateAuthToken(authToken);

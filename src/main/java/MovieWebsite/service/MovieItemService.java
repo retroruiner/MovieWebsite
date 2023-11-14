@@ -16,15 +16,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 public class MovieItemService {
-    private MovieItemRepository movieItemRepository;
-    private MovieCollectionRepository movieCollectionRepository;
-    private MovieCollectionService movieCollectionService;
-    private UserRepository userRepository;
+    private final MovieItemRepository movieItemRepository;
+    private final MovieCollectionRepository movieCollectionRepository;
+    private final MovieCollectionService movieCollectionService;
+    private final UserRepository userRepository;
 
+    @Transactional
     public void addMovie(MovieItemData movieItemData) {
         MovieItem movieItem = MovieItem.builder()
                 .id(movieItemData.id)
@@ -37,18 +39,20 @@ public class MovieItemService {
                 .genreList(movieItemData.genreList)
                 .build();
 
-        movieItemRepository.createMovieItem(movieItem);
+        movieItemRepository.save(movieItem); //creates
     }
 
+    @Transactional
     public void rateMovie(int userID, String movieName, int rating) {
-        UserAccount user = userRepository.findByUserID(userID);
+        Optional<UserAccount> userOptional = userRepository.findById(userID);
+        UserAccount user = userOptional.get();
         MovieItem movie = movieItemRepository.findByName(movieName);
         if(movie != null && user != null) {
             //TODO: add range of the rating to check if it's valid
             //if (rating >= 1 && rating <=10
 
             movie.setRating(rating);
-            movieItemRepository.updateMovieItem(movie);
+            movieItemRepository.save(movie); //updates
         } else {
             throw new IllegalArgumentException("User or movie does not exist.");
         }

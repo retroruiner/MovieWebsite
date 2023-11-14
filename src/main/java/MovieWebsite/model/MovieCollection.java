@@ -1,14 +1,33 @@
 package MovieWebsite.model;
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+@Setter
 @Getter
+@Entity
+@EqualsAndHashCode(of = "id")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class MovieCollection {
+    @Id
+    @GeneratedValue
+    private int id;
     private String name;
+
+    @ManyToMany
+    @JoinTable(
+            name = "movie_collection_movies",
+            joinColumns = @JoinColumn(name = "movie_collection_id"),
+            inverseJoinColumns = @JoinColumn(name = "movie_id"))
     private List<MovieItem> movies;
+
+    @ManyToOne
+    private UserAccount userAccount;
 
     public MovieCollection(String name) {
         this.name = name;

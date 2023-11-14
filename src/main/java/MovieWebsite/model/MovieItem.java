@@ -1,9 +1,10 @@
 package MovieWebsite.model;
 
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import java.util.List;
@@ -12,8 +13,14 @@ import java.util.Date;
 
 @Getter
 @Setter
+@Entity
+@EqualsAndHashCode(of = "id")
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class MovieItem {
+    @Id
+    @GeneratedValue
     private int id;
     private int duration;
     private float rating;

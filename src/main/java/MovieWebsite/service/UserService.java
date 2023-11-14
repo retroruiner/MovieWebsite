@@ -6,24 +6,25 @@ import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.UserRepository;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.Random;
 
+@RequiredArgsConstructor
+@Service
 public class UserService {
     private final UserRepository userRepository;
-    private MovieCollectionService movieCollectionService;
-
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    private final MovieCollectionService movieCollectionService;
 
     public void registerUser(UserRegistrationData userRegistrationData) {
         validateUserDoesNotExist(userRegistrationData.email, userRegistrationData.nickname);
         UserAccount userAccount = createUserAccount(userRegistrationData);
-        userRepository.createUserAccount(userAccount);
+        userRepository.save(userAccount);
     }
 
     private void validateUserDoesNotExist(String email, String nickname) {
@@ -33,7 +34,6 @@ public class UserService {
     }
     private UserAccount createUserAccount(UserRegistrationData userRegistrationData) {
         return UserAccount.builder()
-                .id(generateRandomId())
                 .fullName(userRegistrationData.fullName)
                 .nickname(userRegistrationData.nickname)
                 .password(userRegistrationData.password)
@@ -42,6 +42,7 @@ public class UserService {
                 .build();
     }
 
+    //TODO: delete generateRandomID()
     private int generateRandomId() {
         Random random = new Random();
         int id;
@@ -51,8 +52,9 @@ public class UserService {
         return id;
     }
 
+    //TODO: delete isUserIdAvailable()
     private boolean isUserIdAvailable(int id) {
-        UserAccount existingUser = userRepository.findByUserID(id);
+        Optional<UserAccount> existingUser = userRepository.findById(id);
         return existingUser == null;
     }
 

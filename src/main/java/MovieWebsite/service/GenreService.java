@@ -1,3 +1,4 @@
+/*
 package MovieWebsite.service;
 
 import MovieWebsite.model.Genre;
@@ -46,3 +47,4 @@ public class GenreService {
         return genreRepository.getMoviesByGenre(genre);
     }
 }
+ */

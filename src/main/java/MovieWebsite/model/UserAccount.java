@@ -1,10 +1,7 @@
 package MovieWebsite.model;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 public class UserAccount {
+    @Id
+    @GeneratedValue
     private int id;
 
     private String fullName;
@@ -29,6 +28,7 @@ public class UserAccount {
 
     //TODO: Implement hashing algorithm
 
+    @OneToMany(mappedBy = "userAccount")
     private List<MovieCollection> listOfCollections;
 
     @ManyToMany
