@@ -6,7 +6,14 @@ import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.MovieCollectionRepository;
 import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.repository.UserRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.Optional;
 
+@RequiredArgsConstructor
+@Service
 public class MovieCollectionService {
     private MovieCollectionRepository movieCollectionRepository;
     private UserRepository userRepository;

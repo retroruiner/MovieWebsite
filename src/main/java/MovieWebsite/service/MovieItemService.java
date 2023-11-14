@@ -8,11 +8,17 @@ import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.MovieCollectionRepository;
 import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.Builder;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
 
+@RequiredArgsConstructor
+@Service
 public class MovieItemService {
     private MovieItemRepository movieItemRepository;
     private MovieCollectionRepository movieCollectionRepository;

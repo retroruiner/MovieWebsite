@@ -12,9 +12,13 @@ import java.util.List;
 
 @Setter
 @Getter
-@Builder
+@EqualsAndHashCode(of = "id")
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
 public class UserAccount {
     private int id;
+
     private String fullName;
     private String nickname;
     private Date dateOfBirth;
@@ -27,7 +31,23 @@ public class UserAccount {
 
     private List<MovieCollection> listOfCollections;
 
-    private final List<UserAccount> friendList;
+    @ManyToMany
+    @JoinTable(
+            name = "user_friends",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "friend_id"))
+    private List<UserAccount> friendList;
+
+    @Builder
+    public UserAccount(String fullName, String nickname, Date dateOfBirth, String email, String password, boolean loggedIn, String authToken) {
+        this.fullName = fullName;
+        this.nickname = nickname;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.password = password;
+        this.loggedIn = loggedIn;
+        this.authToken = authToken;
+    }
 
     public void createNewCollection(String name) {
         listOfCollections.add(new MovieCollection(name));
@@ -36,6 +56,12 @@ public class UserAccount {
     private void verifyCollectionExistence() {
         if(this.listOfCollections == null) {
             this.listOfCollections = new ArrayList<>();
+        }
+    }
+
+    private void verifyFriendListExistence() {
+        if(this.friendList == null) {
+            this.friendList = new ArrayList<>();
         }
     }
 

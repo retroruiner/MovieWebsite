@@ -21,6 +21,7 @@ public class MovieItem {
     private String director;
     private String countryOfOrigin;
     private Date releaseDate;
+
     private List<Genre> genreList;
 
 
