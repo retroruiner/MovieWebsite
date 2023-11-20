@@ -12,85 +12,75 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
-@RequiredArgsConstructor
+
 @Service
+@RequiredArgsConstructor
 public class MovieCollectionService {
     private final MovieCollectionRepository movieCollectionRepository;
     private final UserRepository userRepository;
     private final MovieItemRepository movieItemRepository;
 
-    public boolean isMovieInCollection(MovieCollection collection, MovieItem movie) {
-        if (movieCollectionRepository.getMovieInCollection(collection, movie) == null)
-            return false;
-
-        return true;
+    private boolean isMovieInCollection(MovieCollection collection, MovieItem movie) { //TODO: make private
+        return collection.getMovies().contains(movie);
     }
-    public void checkUserCollectionExistence(int userID, int movieCollectionId) {
-        if (!(userRepository.existsById(userID)) || !(movieCollectionRepository.existsById(movieCollectionId))) throw new IllegalArgumentException("Invalid user or collection.");
+
+    private UserAccount fetchUser(int userID) {
+        Optional<UserAccount> userOptional = userRepository.findById(userID);
+        return userOptional.orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    private MovieItem fetchMovie(String movieName) {
+        return movieItemRepository.findByTitle(movieName).orElseThrow(() -> new RuntimeException("Movie " + movieName + " does not exist"));
+    }
+
+    private boolean isUserCollectionExistent(UserAccount userAccount, String collectionName) {
+        return movieCollectionRepository.findByNameAndUserAccount(collectionName, userAccount).isPresent();
+    }
+
+    private MovieCollection fetchCollection(UserAccount userAccount, String collectionName) {
+        return movieCollectionRepository.findByNameAndUserAccount(collectionName, userAccount)
+                .orElseThrow(() -> new IllegalArgumentException("Collection with name " + collectionName + " does not exist"));
     }
 
     @Transactional
     public void createNewCollection(int userID, String collectionName) {
-        MovieCollection movieCollection = new MovieCollection(collectionName);
-        Optional<UserAccount> userOptional = userRepository.findById(userID);
-        UserAccount user = userOptional.get();
-        checkUserCollectionExistence(userID, movieCollection.getId());
-        user.createNewCollection(collectionName);
+        UserAccount userAccount = fetchUser(userID);
+        MovieCollection movieCollection = new MovieCollection(collectionName, userAccount);
+        if(!isUserCollectionExistent(userAccount, movieCollection.getName())) {
+            movieCollectionRepository.save(movieCollection);
+        } else {
+            throw new RuntimeException("Collection with name " + collectionName + " exists");
+        }
+    }
 
+    @Transactional
+    public void addMovieToCollection(int userId, String movieName, String collectionName) {
+        UserAccount userAccount = fetchUser(userId);
+        MovieItem movie = fetchMovie(movieName);
+        MovieCollection movieCollection = fetchCollection(userAccount, collectionName);
+        if(isMovieInCollection(movieCollection, movie)) {
+            throw new RuntimeException("Movie already in collection: " + movieName);
+        }
+        movieCollection.getMovies().add(movie);
         movieCollectionRepository.save(movieCollection);
-        userRepository.save(user); //creates
-    }
-
-    public void addMovieToCollection(int userID, String movieName, int collectionID) {
-        modifyMovieInCollection(userID, movieName, collectionID, true);
-    }
-
-    public void removeMovieFromCollection(int userID, String movieName, int collectionID) {
-        modifyMovieInCollection(userID, movieName, collectionID, false);
     }
 
     @Transactional
-    public void modifyMovieInCollection(int userID, String movieName, int collectionID, boolean add) {
-        Optional<UserAccount> userOptional = userRepository.findById(userID);
-        UserAccount userAccount = userOptional.get();
-        MovieItem movie = movieItemRepository.findByName(movieName);
-        MovieCollection collection = movieCollectionRepository.getById(collectionID);
-
-        checkUserCollectionExistence(userID, collection.getId());
-
-        if (add) {
-            if (!isMovieInCollection(collection, movie)) {
-                userAccount.addMovieToCollection(movie, collection);
-                movieCollectionRepository.addMovieToCollection(movie, collection);
-            } else {
-                throw new IllegalArgumentException("The movie is already in the collection.");
-            }
-        } else {
-            if (isMovieInCollection(collection, movie)) {
-                userAccount.deleteCollection(collection);
-                movieCollectionRepository.save(collection); //updates
-            } else {
-                throw new IllegalArgumentException("The movie is not in the collection.");
-            }
+    public void removeMovieFromCollection(int userId, String movieName, String collectionName) {
+        UserAccount userAccount = fetchUser(userId);
+        MovieItem movie = fetchMovie(movieName);
+        MovieCollection movieCollection = fetchCollection(userAccount, collectionName);
+        if(!isMovieInCollection(movieCollection, movie)) {
+            throw new RuntimeException("No movie in collection: " + movieName);
         }
-
-        userRepository.save(userAccount); //updates
+        movieCollection.getMovies().remove(movie);
+        movieCollectionRepository.save(movieCollection);
     }
 
-
     @Transactional
-    public void deleteCollection(int userID, int collectionID) {
-        Optional<UserAccount> userOptional = userRepository.findById(userID);
-        UserAccount user = userOptional.get();
-        MovieCollection collection = movieCollectionRepository.getById(collectionID);
-        checkUserCollectionExistence(userID, collection.getId());
-        if (user.getListOfCollections().contains(collection)) {
-            user.deleteCollection(collection);
-
-            movieCollectionRepository.delete(collection);
-            userRepository.save(user);  //updates
-        } else {
-            throw new IllegalArgumentException("The user does not have this collection.");
-        }
+    public void deleteCollection(int userID, String collectionName) {
+        UserAccount userAccount = fetchUser(userID);
+        MovieCollection movieCollection = fetchCollection(userAccount, collectionName);
+        movieCollectionRepository.delete(movieCollection);
     }
 }

@@ -10,20 +10,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
 import java.util.Random;
 
-@RequiredArgsConstructor
+
 @Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
     private final MovieCollectionService movieCollectionService;
 
-    public void registerUser(UserRegistrationData userRegistrationData) {
-        validateUserDoesNotExist(userRegistrationData.email, userRegistrationData.nickname);
-        UserAccount userAccount = createUserAccount(userRegistrationData);
+    @Transactional
+    public void registerUser(UserAccount userAccount) {
+        //validateUserDoesNotExist(userRegistrationData.email, userRegistrationData.nickname);
+        validateUserDoesNotExist(userAccount.getEmail(), userAccount.getNickname());
         userRepository.save(userAccount);
     }
 
@@ -31,31 +34,6 @@ public class UserService {
         if (userRepository.findByEmail(email) != null || userRepository.findByNickname(nickname) != null) {
             throw new IllegalArgumentException("User with the given credentials already exists");
         }
-    }
-    private UserAccount createUserAccount(UserRegistrationData userRegistrationData) {
-        return UserAccount.builder()
-                .fullName(userRegistrationData.fullName)
-                .nickname(userRegistrationData.nickname)
-                .password(userRegistrationData.password)
-                .email(userRegistrationData.email)
-                .dateOfBirth(userRegistrationData.dateOfBirth)
-                .build();
-    }
-
-    //TODO: delete generateRandomID()
-    private int generateRandomId() {
-        Random random = new Random();
-        int id;
-        do {
-            id = 100000 + random.nextInt(999999);
-        } while (!isUserIdAvailable(id));
-        return id;
-    }
-
-    //TODO: delete isUserIdAvailable()
-    private boolean isUserIdAvailable(int id) {
-        Optional<UserAccount> existingUser = userRepository.findById(id);
-        return existingUser == null;
     }
 
     public void setProfilePicture(UserAccount user, String imageUrl) {
@@ -71,6 +49,7 @@ public class UserService {
         //TODO: Delete friend
     }
 
+    @Getter
     @Builder
     public static class UserRegistrationData {
         private String fullName;

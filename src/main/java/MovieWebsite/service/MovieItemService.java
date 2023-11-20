@@ -10,6 +10,7 @@ import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class MovieItemService {
     private final MovieItemRepository movieItemRepository;
     private final MovieCollectionRepository movieCollectionRepository;
@@ -27,49 +28,43 @@ public class MovieItemService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void addMovie(MovieItemData movieItemData) {
-        MovieItem movieItem = MovieItem.builder()
-                .id(movieItemData.id)
-                .duration(movieItemData.duration)
-                .rating(movieItemData.rating)
-                .title(movieItemData.title)
-                .director(movieItemData.director)
-                .countryOfOrigin(movieItemData.countryOfOrigin)
-                .releaseDate(movieItemData.releaseDate)
-                .genreList(movieItemData.genreList)
-                .build();
+    public void addMovie(MovieItem movieItem) {
+        if(isMovieExistent(movieItem.getTitle())) {
+            throw new RuntimeException("Movie " + movieItem.getTitle() + " already exists");
+        }
+        movieItemRepository.save(movieItem);
+    }
 
-        movieItemRepository.save(movieItem); //creates
+    private boolean isMovieExistent(String movieName) {
+        return movieItemRepository.findByTitle(movieName).isPresent();
     }
 
     @Transactional
-    public void rateMovie(int userID, String movieName, int rating) {
-        Optional<UserAccount> userOptional = userRepository.findById(userID);
-        UserAccount user = userOptional.get();
-        MovieItem movie = movieItemRepository.findByName(movieName);
-        if(movie != null && user != null) {
-            //TODO: add range of the rating to check if it's valid
-            //if (rating >= 1 && rating <=10
+    public void updateRating(int movieId, float rating) {
+        Optional<MovieItem> movieItemFromDB = movieItemRepository.findById(movieId);
+        MovieItem movieItem = movieItemFromDB.get();
+        float newRating = calculateRating(movieItem.getRating(), movieItem.getNumOfUsersVoted(), rating);
+        movieItem.setRating(newRating);
+        //movieItemRepository.save(movieItem);
 
-            movie.setRating(rating);
-            movieItemRepository.save(movie); //updates
-        } else {
-            throw new IllegalArgumentException("User or movie does not exist.");
-        }
     }
+
+    private float calculateRating(float previousRating, int numVotes, float newRating) {
+        return (previousRating * numVotes + newRating) / (++numVotes);
+    }
+
+
     /*
     public void clearPreviousCollections(UserAccount user, MovieItem movie);
     public void preventDuplicateAddition(UserAccount user, MovieItem movie, String collectionName);
-    public List<MovieItem> getMoviesByGenre(String genreName);
     public List<MovieItem> getMoviesByParameters(String parameterName, String parameterValue);
     public List<MovieItem> sortMoviesByParameter(String parameterName);
-
      */
+
+    @Getter
     @Builder
     public static class MovieItemData {
-        private int id;
         private int duration;
-        private float rating;
         private String title;
         private String director;
         private String countryOfOrigin;

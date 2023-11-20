@@ -1,66 +1,64 @@
 package MovieWebsite.service;
 
 import MovieWebsite.model.Genre;
+import MovieWebsite.model.MovieCollection;
 import MovieWebsite.model.MovieItem;
 import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.repository.UserRepository;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+@Service
+@RequiredArgsConstructor
 public class InitDbService {
-    private UserRepository userRepository;
-    private MovieItemRepository movieItemRepository;
-    private MovieItemService movieItemService;
-    private UserService userService;
+    private final UserRepository userRepository;
+    private final MovieItemRepository movieItemRepository;
+    private final MovieItemService movieItemService;
+    private final UserService userService;
+    private final MovieCollectionService movieCollectionService;
 
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
+    @Transactional
     public void initDb() {
-        try {
-                //TODO: change user constructor to directly enter date as string
-                Date dateOfBirth = dateFormat.parse("19.09.2003");
-            Date release = dateFormat.parse("19.09.2023");
-            List<Genre> genreList = Arrays.asList(Genre.DRAMA, Genre.ROMANCE);
+            List<Genre> genreList = new ArrayList<>(Arrays.asList(Genre.SCI_FI, Genre.THRILLER));
 
-                UserAccount userAccount1 =
+            UserAccount userAccount1 =
                         UserAccount.builder()
-                                .fullName("Ti Lalka")
-                                .nickname("nagibator")
+                                .fullName("Adilet Sooronbaev")
+                                .nickname("retroruiner")
                                 .password("password1")
-                                .email("www@gmail.com")
-                                .dateOfBirth(dateOfBirth)
+                                .email("s.adilet@gmail.com")
+                                .dateOfBirth(java.sql.Date.valueOf("2003-07-26"))
                                 .loggedIn(false)
                                 .authToken("token")
                         .build();
-            userRepository.save(userAccount1);
+            userService.registerUser(userAccount1);
 
-
-//            new UserAccount(0, "Ti Lalka", "nagibator", dateOfBirth, "www@gmail.com", "password1", false, "token");
 
             MovieItem movieItem = MovieItem.builder()
-                    .id(12)
-                    .duration(23)
-                    .rating(3)
-                    .title("Паук")
-                    .director("Chris")
-                    .countryOfOrigin("USA")
-                    .releaseDate(release)
+                    .duration(2.5f)
+                    .title("Cyberpunk 2077")
+                    .director("CD Projekt Red")
+                    .countryOfOrigin("Poland")
+                    .releaseDate(java.sql.Date.valueOf("2020-12-20"))
                     .genreList(genreList)
                     .build();
 
-            movieItemRepository.save(movieItem);
+            movieItemService.addMovie(movieItem);
 
-            System.out.println(userAccount1);
+//            movieItemService.updateRating(952, 5.6f);
+//        movieCollectionService.createNewCollection(352, "Arigato");
 
-            //movieItemService.rateMovie(0, "Паук", 10);
-
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

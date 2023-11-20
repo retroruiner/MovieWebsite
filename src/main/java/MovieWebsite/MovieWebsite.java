@@ -1,17 +1,16 @@
-package Website;
+package MovieWebsite;
 
-import MovieWebsite.model.UserAccount;
-import MovieWebsite.repository.UserRepository;
 import MovieWebsite.service.InitDbService;
-import MovieWebsite.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
+
 
 @SpringBootApplication
+@RequiredArgsConstructor
 public class MovieWebsite implements CommandLineRunner {
-    private InitDbService initDbService;
+    private final InitDbService initDbService;
 
     public static void main(String[] args) {
         SpringApplication.run(MovieWebsite.class, args);
