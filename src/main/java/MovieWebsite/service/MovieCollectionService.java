@@ -20,7 +20,7 @@ public class MovieCollectionService {
     private final UserRepository userRepository;
     private final MovieItemRepository movieItemRepository;
 
-    private boolean isMovieInCollection(MovieCollection collection, MovieItem movie) { //TODO: make private
+    public boolean isMovieInCollection(MovieCollection collection, MovieItem movie) {
         return collection.getMovies().contains(movie);
     }
 

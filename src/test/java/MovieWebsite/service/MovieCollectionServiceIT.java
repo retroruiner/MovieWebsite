@@ -40,20 +40,10 @@ public class MovieCollectionServiceIT {
     @Autowired
     UserRepository userRepository;
 
-
-
     @Test
-    public void testAddMovieToCollection() {
-        List<Genre> genreList = Arrays.asList(Genre.ACTION, Genre.COMEDY, Genre.DRAMA);
-        MovieItem movieItem = MovieItem.builder()
-                .duration(23)
-                .rating(2)
-                .title("Love")
-                .director("Katty")
-                .countryOfOrigin("Thailand")
-                .releaseDate(java.sql.Date.valueOf("2009-01-09"))
-                .genreList(genreList)
-                .build();
+    @Transactional   // fetch the collection within the same transaction where it was loaded
+    public void testAddRemoveMovieFromCollection() {
+        MovieItem movieItem = generateMovieItem();
         movieItemRepository.save(movieItem);
 
         UserAccount userAccount = generateUserAccount();
@@ -62,83 +52,49 @@ public class MovieCollectionServiceIT {
         MovieCollection movieCollection = new MovieCollection("Watch Later", userAccount);
         movieCollectionRepository.save(movieCollection);
 
-        //When
+        //add
         movieCollectionService.addMovieToCollection(userAccount.getId(), movieItem.getTitle(), movieCollection.getName());
 
-        //Then
+        MovieCollection collectionWithMovie = movieCollectionRepository.findByNameAndUserAccount(movieCollection.getName(), userAccount)
+                .orElseThrow(() -> new RuntimeException("Collection not found"));
         UserAccount updatedUser = userRepository.findById(userAccount.getId()).orElse(null);
         assertNotNull(updatedUser);
-        assertNotNull(movieCollection);
-        assertTrue(movieCollection.getMovies().contains(movieItem));
+        assertNotNull(collectionWithMovie);
+        assertTrue(movieCollectionService.isMovieInCollection(collectionWithMovie, movieItem));
 
-        Optional<MovieCollection> updatedCollection = movieCollectionRepository.findById(movieCollection.getId());
-        assertTrue(updatedCollection.isPresent());
-        assertTrue(updatedCollection.get().getMovies().contains(movieItem));
 
+        //remove
+        movieCollectionService.removeMovieFromCollection(userAccount.getId(), movieItem.getTitle(), movieCollection.getName());
+
+        // Verify that the movie is not in the collection anymore
+        MovieCollection collectionWithoutMovie = movieCollectionRepository.findByNameAndUserAccount(movieCollection.getName(), userAccount)
+                .orElseThrow(() -> new RuntimeException("Collection not found"));
+        assertFalse(movieCollectionService.isMovieInCollection(collectionWithoutMovie, movieItem));
     }
 
-    @Transactional
     @Test
-    public void testCreateNewCollection() {
+    public void testCreateDeleteNewCollection() {
         UserAccount userAccount = generateUserAccount();
         userRepository.save(userAccount);
 
+        //Create
         movieCollectionService.createNewCollection(userAccount.getId(), "Test New Collection");
 
         Optional<MovieCollection> movieCollection = movieCollectionRepository.findByNameAndUserAccount("Test New Collection", userAccount);
         assertNotNull(movieCollection.get());
         assertEquals(userAccount, movieCollection.get().getUserAccount());
+
+        //Testing with non-empty collection
+        MovieItem movieItem = generateMovieItem();
+        movieItemRepository.save(movieItem);
+        movieCollectionService.addMovieToCollection(userAccount.getId(), movieItem.getTitle(), "Test New Collection");
+
+        //Delete
+        movieCollectionService.deleteCollection(userAccount.getId(), "Test New Collection");
+
+        Optional<MovieCollection> deletedMovieCollection = movieCollectionRepository.findByNameAndUserAccount("Test New Collection", userAccount);
+        assertTrue(deletedMovieCollection.isEmpty());
     }
-
-
-
-
-    /*
-    @Test
-    public void testIsMovieInCollection() {
-        // Given
-        //UserAccount userAccount = generateUserAccount();
-        UserService.UserRegistrationData data = UserService.UserRegistrationData.builder()
-                .fullName("Eliza Johnson")
-                .email("eliza@gmail.com")
-                .nickname("LizzyWizzy")
-                .password("some_password")
-                .dateOfBirth(java.sql.Date.valueOf("2020-01-09"))
-                .build();
-
-        UserAccount userAccount = UserAccount.builder()
-                .fullName(data.getFullName())
-                .nickname(data.getNickname())
-                .password(data.getPassword())
-                .email(data.getEmail())
-                .dateOfBirth(data.getDateOfBirth())
-                .build();
-
-        userRepository.save(userAccount);
-
-        MovieCollection movieCollection = new MovieCollection("Action Movies", userAccount);
-        movieCollectionRepository.save(movieCollection);
-
-        MovieItem movieItem1 = new MovieItem();
-        MovieItem movieItem2 = new MovieItem();
-        movieItemRepository.save(movieItem1);
-        movieItemRepository.save(movieItem2);
-
-        movieCollection.getMovies().add(movieItem1);
-
-        System.out.println();
-
-        // When
-        boolean inCollection = movieCollectionService.isMovieInCollection(movieCollection, movieItem1);
-        boolean notInCollection = movieCollectionService.isMovieInCollection(movieCollection, movieItem2);
-
-        // Then
-        assertTrue(inCollection);
-        assertFalse(notInCollection);
-    }
-
-     */
-
 
     private UserAccount generateUserAccount() {
         UserService.UserRegistrationData data = UserService.UserRegistrationData.builder()
@@ -158,5 +114,18 @@ public class MovieCollectionServiceIT {
                 .build();
     }
 
+    private MovieItem generateMovieItem() {
+        List<Genre> genreList = Arrays.asList(Genre.ACTION, Genre.COMEDY, Genre.DRAMA);
+        MovieItem movieItem = MovieItem.builder()
+                .duration(23)
+                .rating(2)
+                .title("Love")
+                .director("Katty")
+                .countryOfOrigin("Thailand")
+                .releaseDate(java.sql.Date.valueOf("2009-01-09"))
+                .genreList(genreList)
+                .build();
 
+        return movieItem;
+    }
 }

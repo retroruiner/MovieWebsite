@@ -100,7 +100,4 @@ public class UserServiceTest {
 
         verify(userRepository, never()).save(Mockito.any(UserAccount.class));
     }
-
-    //private void validateUserDoesNotExist(String email, String nickname)
-
 }

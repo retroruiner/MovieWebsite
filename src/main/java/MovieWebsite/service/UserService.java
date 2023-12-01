@@ -25,7 +25,6 @@ public class UserService {
 
     @Transactional
     public void registerUser(UserAccount userAccount) {
-        //validateUserDoesNotExist(userRegistrationData.email, userRegistrationData.nickname);
         validateUserDoesNotExist(userAccount.getEmail(), userAccount.getNickname());
         userRepository.save(userAccount);
     }

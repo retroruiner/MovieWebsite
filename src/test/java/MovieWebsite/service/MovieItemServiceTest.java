@@ -36,29 +36,7 @@ public class MovieItemServiceTest {
 
     @Test
     public void testUpdateRating() {
-        try {
-            releaseDate = dateFormat.parse("26.07.2003");
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
-
-        MovieItemService.MovieItemData movieItemData = new MovieItemService.MovieItemData(
-                255,
-                "Inception",
-                "Mike",
-                "USA",
-                releaseDate,
-                genreList
-        );
-
-        MovieItem movieItem = MovieItem.builder()
-                .duration(movieItemData.getDuration())
-                .title(movieItemData.getTitle())
-                .director(movieItemData.getDirector())
-                .countryOfOrigin(movieItemData.getCountryOfOrigin())
-                .releaseDate(movieItemData.getReleaseDate())
-                .genreList(movieItemData.getGenreList())
-                .build();
+        MovieItem movieItem = generateMovieItem();
 
         float newRate = 9;
         int numVotes = 2;
@@ -67,16 +45,32 @@ public class MovieItemServiceTest {
 
         Mockito.when(movieItemRepository.findById(movieItem.getId())).thenReturn(Optional.of(movieItem));
 
+        //update rating
         movieItemService.updateRating(movieItem.getId(), newRate);
 
         verify(movieItemRepository, times(1)).findById(movieItem.getId());
-        //verify(movieItemRepository, times(1)).save(movieItem);
         assertEquals(expected, movieItem.getRating());
 
     }
 
     @Test
     public void testAddMovie() {
+        MovieItem movieItem = generateMovieItem();
+
+        Mockito.when(movieItemRepository.save(Mockito.any(MovieItem.class))).thenReturn(movieItem); //TODO: check Mockito
+
+        movieItemService.addMovie(movieItem);
+
+        assertEquals("Inception", movieItem.getTitle());
+        assertEquals(255, movieItem.getDuration());
+        assertEquals("USA", movieItem.getCountryOfOrigin());
+        assertEquals("Mike", movieItem.getDirector());
+        assertEquals(releaseDate, movieItem.getReleaseDate());
+        assertEquals(genreList, movieItem.getGenreList());
+    }
+
+
+    private MovieItem generateMovieItem() {
         try {
             releaseDate = dateFormat.parse("26.07.2020");
         } catch (ParseException e) {
@@ -101,15 +95,6 @@ public class MovieItemServiceTest {
                 .genreList(movieItemData.getGenreList())
                 .build();
 
-        Mockito.when(movieItemRepository.save(Mockito.any(MovieItem.class))).thenReturn(movieItem); //TODO: check Mockito
-
-        movieItemService.addMovie(movieItem);
-
-        assertEquals("Inception", movieItem.getTitle());
-        assertEquals(255, movieItem.getDuration());
-        assertEquals("USA", movieItem.getCountryOfOrigin());
-        assertEquals("Mike", movieItem.getDirector());
-        assertEquals(releaseDate, movieItem.getReleaseDate());
-        assertEquals(genreList, movieItem.getGenreList());
+        return movieItem;
     }
 }
