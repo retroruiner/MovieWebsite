@@ -22,17 +22,14 @@ public class UserAuthService {
         if (userAccount != null && password == userAccount.getPassword()) {
             return userAccount;
         }
-
         return null;
     }
 
     @Transactional
     public String generateAuthToken(UserAccount userAccount) {
         String authToken = generateRandomToken();
-
         userAccount.setAuthToken(authToken);
-        //userRepository.save(userAccount);
-
+        userRepository.save(userAccount);
         return authToken;
     }
 
@@ -46,7 +43,6 @@ public class UserAuthService {
         UserAccount userAccount = userRepository.findByAuthToken(authToken);
         if (userAccount != null) {
             userAccount.setAuthToken(null);
-            //userRepository.save(userAccount);
         }
     }
 
@@ -83,7 +79,7 @@ public class UserAuthService {
 
             System.out.println("User logged out");
         } else {
-            throw new IllegalArgumentException("Such user does not exist");
+            throw new NullPointerException("Such user does not exist");
         }
     }
 
