@@ -9,8 +9,10 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.Optional;
@@ -21,25 +23,21 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private final MovieCollectionService movieCollectionService;
 
     @Transactional
-    public void registerUser(UserAccount userAccount) {
+    public UserAccount registerUser(UserAccount userAccount) {
         validateUserDoesNotExist(userAccount.getEmail(), userAccount.getNickname());
-        userRepository.save(userAccount);
+        return userRepository.save(userAccount);
     }
 
     private void validateUserDoesNotExist(String email, String nickname) {
         if (userRepository.findByEmail(email) != null || userRepository.findByNickname(nickname) != null) {
-            throw new IllegalArgumentException("User with the given credentials already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User with email " + email + " or nickname " + nickname + " already exists.");
         }
     }
 
-    public void setProfilePicture(UserAccount user, String imageUrl) {
-        //TODO: set PFP
-    }
     public void sendFriendRequest(UserAccount sender, UserAccount receiver){
-        //TODO: Friend request
+
     }
     public void acceptFriendRequest(UserAccount user, UserAccount friend) {
         //TODO: Accept friend request

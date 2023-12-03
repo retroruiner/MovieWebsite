@@ -21,11 +21,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class InitDbService {
-    private final UserRepository userRepository;
-    private final MovieItemRepository movieItemRepository;
-    private final MovieItemService movieItemService;
-    private final UserService userService;
-    private final MovieCollectionService movieCollectionService;
+//    private final UserRepository userRepository;
+//    private final MovieItemRepository movieItemRepository;
+//    private final MovieItemService movieItemService;
+//    private final UserService userService;
+//    private final MovieCollectionService movieCollectionService;
 
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 

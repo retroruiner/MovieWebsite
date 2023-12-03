@@ -3,6 +3,8 @@ import MovieWebsite.model.MovieItem;
 import MovieWebsite.model.UserAccount;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -13,4 +15,10 @@ public interface UserRepository extends JpaRepository<UserAccount, Integer> {  /
     UserAccount findByEmail(String email);
     void deleteById(int userId);
     UserAccount findByAuthToken(String token);
+
+    @Modifying
+    @Query("UPDATE UserAccount user SET user.authToken = ?2 WHERE user.id = ?1")
+    void updateUserToken(int userId, String token);
+
+
 }

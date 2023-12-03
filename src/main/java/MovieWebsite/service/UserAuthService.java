@@ -5,9 +5,13 @@ import MovieWebsite.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.security.SecureRandom;
 import java.util.Base64;
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -15,22 +19,11 @@ import java.util.Optional;
 public class UserAuthService {
     private final UserRepository userRepository;
 
-
-    public UserAccount authenticateUser(String nickname, String password) {
-        UserAccount userAccount = userRepository.findByNickname(nickname);
-        UserAccount authenticatedUser = null;
-        if (userAccount != null && password == userAccount.getPassword()) {
-            return userAccount;
-        }
-        return null;
-    }
-
     @Transactional
     public String generateAuthToken(UserAccount userAccount) {
-        String authToken = generateRandomToken();
-        userAccount.setAuthToken(authToken);
-        userRepository.save(userAccount);
-        return authToken;
+        byte[] tokenBytes = new byte[32];
+        new SecureRandom().nextBytes(tokenBytes);
+        return Base64.getEncoder().encodeToString(tokenBytes);
     }
 
     public boolean verifyAuthToken(String authToken) {
@@ -46,31 +39,38 @@ public class UserAuthService {
         }
     }
 
-    public String generateRandomToken() {
-        byte[] tokenBytes = new byte[32];
-        new SecureRandom().nextBytes(tokenBytes);
-        return Base64.getEncoder().encodeToString(tokenBytes);
+    public UserAccount authenticateUser(String nickname, String password) {
+        UserAccount userAccount = userRepository.findByNickname(nickname);
 
+        System.out.println(Objects.equals(userAccount.getPassword(), password));
+        if (Objects.equals(userAccount.getPassword(), password)) {
+
+            return userAccount;
+        }
+        return null;
     }
 
     @Transactional
-    public void loginUser(String nickname, String password) {
+    public String loginUser(String nickname, String password) {
         UserAccount userAccount = authenticateUser(nickname, password);
-        if (userAccount != null && verifyPassword(password, userAccount)) {
+        if (userAccount != null) {
             String authToken = generateAuthToken(userAccount);
-            userAccount.setAuthToken(authToken);
-            userAccount.setLoggedIn(true);
-
-            System.out.println("User " + nickname + " logged in");
+            updateUserToken(userAccount, authToken);
+            return authToken;
         } else {
-            throw new IllegalArgumentException("Such user does not exist");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect nickname or password");
         }
+    }
+
+    private void updateUserToken(UserAccount userAccount, String authToken) {
+        userAccount.setAuthToken(authToken);
+        userAccount.setLoggedIn(true);
+        userRepository.save(userAccount);
     }
 
     @Transactional
     public void logoutUser(int userId) {
-        Optional<UserAccount> userOptional = userRepository.findById(userId);
-        UserAccount user = userOptional.get();
+        UserAccount user = fetchUser(userId);
         if (user != null) {
             String authToken = user.getAuthToken();
             invalidateAuthToken(authToken);
@@ -82,8 +82,8 @@ public class UserAuthService {
             throw new NullPointerException("Such user does not exist");
         }
     }
-
-    public boolean verifyPassword(String password, UserAccount user) {
-        return (password == user.getPassword());
+    private UserAccount fetchUser(int userID) {
+        Optional<UserAccount> userOptional = userRepository.findById(userID);
+        return userOptional.orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 }
