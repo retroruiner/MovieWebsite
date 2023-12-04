@@ -55,35 +55,30 @@ public class UserAuthService {
         UserAccount userAccount = authenticateUser(nickname, password);
         if (userAccount != null) {
             String authToken = generateAuthToken(userAccount);
-            updateUserToken(userAccount, authToken);
+            updateUserStatus(userAccount, authToken, true);
             return authToken;
         } else {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect nickname or password");
         }
     }
 
-    private void updateUserToken(UserAccount userAccount, String authToken) {
+    private void updateUserStatus(UserAccount userAccount, String authToken, boolean status) {
         userAccount.setAuthToken(authToken);
-        userAccount.setLoggedIn(true);
+        userAccount.setLoggedIn(status);
         userRepository.save(userAccount);
     }
 
     @Transactional
-    public void logoutUser(int userId) {
-        UserAccount user = fetchUser(userId);
+    public boolean logoutUser(String authToken) {
+        UserAccount user = userRepository.findByAuthToken(authToken);
         if (user != null) {
-            String authToken = user.getAuthToken();
-            invalidateAuthToken(authToken);
-            user.setLoggedIn(false);
-            user.setAuthToken(null);
-
-            System.out.println("User logged out");
-        } else {
-            throw new NullPointerException("Such user does not exist");
+            updateUserStatus(user, null, false);
+            return true;
         }
+        return false;
     }
     private UserAccount fetchUser(int userID) {
         Optional<UserAccount> userOptional = userRepository.findById(userID);
-        return userOptional.orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return userOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist"));
     }
 }

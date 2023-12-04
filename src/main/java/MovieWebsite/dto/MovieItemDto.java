@@ -1,6 +1,7 @@
 package MovieWebsite.dto;
 
 import MovieWebsite.model.Genre;
+import MovieWebsite.model.UserAccount;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,4 +21,5 @@ public class MovieItemDto {
     private String countryOfOrigin;
     private Date releaseDate;
     private List<GenreDto> genreList = new ArrayList<>();
+    private List<UserAccountDto> ratedByUsers = new ArrayList<>();
 }

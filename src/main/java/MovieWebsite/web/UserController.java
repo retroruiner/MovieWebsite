@@ -32,15 +32,16 @@ public class UserController {
         );
     }
 
-//    @PostMapping("/login")
-//    public String login(String nickname, String password) {
-//        return userAuthService.loginUser(nickname, password);
-//    }
-
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody UserAccountDto userAccountDto) {
         String authToken = userAuthService.loginUser(userAccountDto.getNickname(), userAccountDto.getPassword());
-        return new ResponseEntity<>(authToken, HttpStatus.OK);
+        return ResponseEntity.ok(authToken);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(@RequestBody UserAccountDto userAccountDto) {
+        boolean isSuccess = userAuthService.logoutUser(userAccountDto.getAuthToken());
+        return isSuccess ? ResponseEntity.ok("Logged out successfully") : ResponseEntity.badRequest().build();
     }
 
 
@@ -49,7 +50,12 @@ public class UserController {
         userRepository.deleteById(id);
     }
 
-    @GetMapping
+    @DeleteMapping("/deleteByToken")
+    public void delete(@RequestBody UserAccountDto userAccountDto) {
+        userRepository.deleteByAuthToken(userAccountDto.getAuthToken());
+    }
+
+    @GetMapping("/findAll")
     public List<UserAccountDto> findAll() {
         return userAccountMapper.usersToDtos(userRepository.findAll());
     }

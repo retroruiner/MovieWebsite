@@ -31,7 +31,7 @@ public class InitDbService {
 
     @Transactional
     public void initDb() {
-//            List<Genre> genreList = new ArrayList<>(Arrays.asList(Genre.SCI_FI, Genre.THRILLER));
+//            List<Genre> genreList = new ArrayList<>(Arrays.asList("Genre.SCI_FI", "Genre.THRILLER"));
 
 //            UserAccount userAccount1 =
 //                        UserAccount.builder()

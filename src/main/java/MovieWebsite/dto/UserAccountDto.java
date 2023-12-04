@@ -20,4 +20,5 @@ public class UserAccountDto {
     private String authToken;
     private List<MovieCollectionDto> listOfCollections = new ArrayList<>();
     private List<UserAccountDto> friendList = new ArrayList<>();
+    private List<MovieItemDto> ratedMovies = new ArrayList<>();
 }

@@ -13,7 +13,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -30,7 +32,7 @@ public class MovieItemService {
     @Transactional
     public void addMovie(MovieItem movieItem) {
         if(isMovieExistent(movieItem.getTitle())) {
-            throw new RuntimeException("Movie " + movieItem.getTitle() + " already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Movie " + movieItem.getTitle() + " already exist");
         }
         movieItemRepository.save(movieItem);
     }
@@ -49,17 +51,33 @@ public class MovieItemService {
 
     }
 
+    private void updateMovieRating(MovieItem movieItem, float newRating) {
+        movieItem.setRating(newRating);
+        movieItem.setNumOfUsersVoted(movieItem.getNumOfUsersVoted() + 1);
+        movieItemRepository.save(movieItem);
+    }
+
+    private void addUserRatedMovie(UserAccount userAccount, MovieItem movieItem) {
+        userAccount.getRatedMovies().add(movieItem);
+        userRepository.save(userAccount);
+    }
+
     private float calculateRating(float previousRating, int numVotes, float newRating) {
         return (previousRating * numVotes + newRating) / (++numVotes);
     }
 
+    private UserAccount fetchUser(String authToken) {
+        UserAccount user = userRepository.findByAuthToken(authToken);
+        if(user == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist");
+        }
+        return user;
+    }
 
-    /*
-    public void clearPreviousCollections(UserAccount user, MovieItem movie);
-    public void preventDuplicateAddition(UserAccount user, MovieItem movie, String collectionName);
-    public List<MovieItem> getMoviesByParameters(String parameterName, String parameterValue);
-    public List<MovieItem> sortMoviesByParameter(String parameterName);
-     */
+    private MovieItem fetchMovie(int movieID) {
+        Optional<MovieItem> movieItemOptional = movieItemRepository.findById(movieID);
+        return movieItemOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie does not exist"));
+    }
 
     @Getter
     @Builder

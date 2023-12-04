@@ -14,8 +14,14 @@ public interface MovieItemRepository extends JpaRepository<MovieItem, Integer> {
 
     @Modifying
     @Query("UPDATE MovieItem m SET m.rating = ?2, m.numOfUsersVoted = m.numOfUsersVoted + 1 WHERE m.id = ?1")
-    void updateMovieItemRating(int MovieId, float rating);
+    void updateMovieItemRating(int movieId, float rating);
 
     @Query("SELECT m.numOfUsersVoted FROM MovieItem m WHERE m.id = ?1")
-    Integer findVotedUsersById(int MovieId);
+    Integer findVotedUsersById(int movieId);
+
+    Iterable<MovieItem> findByTitleContainingIgnoreCase(String title);
+
+    List<MovieItem> findByGenreListContainsIgnoreCase(String genre);
+
+    List<MovieItem> findByRatingGreaterThanEqual(float minRating);
 }

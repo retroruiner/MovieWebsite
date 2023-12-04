@@ -36,6 +36,9 @@ public class MovieItem {
     @Enumerated(EnumType.STRING)
     private List<Genre> genreList = new ArrayList<>();
 
+    @ManyToMany(mappedBy = "ratedMovies")
+    private List<UserAccount> ratedByUsers = new ArrayList<>();
+
     @Transient
     private ArrayList<Float> ratings = new ArrayList<>();
 }

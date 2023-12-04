@@ -14,6 +14,7 @@ public interface UserRepository extends JpaRepository<UserAccount, Integer> {  /
     UserAccount findByNickname(String nickname);
     UserAccount findByEmail(String email);
     void deleteById(int userId);
+    void deleteByAuthToken(String authToken);
     UserAccount findByAuthToken(String token);
 
     @Modifying

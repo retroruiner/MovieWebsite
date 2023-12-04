@@ -1,5 +1,6 @@
 package MovieWebsite.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -15,5 +16,9 @@ public enum GenreDto {
     private String name;
     GenreDto(String name) {
         this.name = name;
+    }
+    @Override
+    public String toString() {
+        return name;
     }
 }

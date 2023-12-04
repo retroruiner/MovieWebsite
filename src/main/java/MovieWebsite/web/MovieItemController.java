@@ -1,7 +1,10 @@
 package MovieWebsite.web;
 
 import MovieWebsite.MovieItemMapper;
+import MovieWebsite.UserAccountMapper;
 import MovieWebsite.dto.MovieItemDto;
+import MovieWebsite.dto.RatingUpdateRequestDto;
+import MovieWebsite.dto.UserAccountDto;
 import MovieWebsite.model.MovieItem;
 import MovieWebsite.repository.MovieItemRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,28 +23,16 @@ public class MovieItemController {
     private final MovieItemMapper movieItemMapper;
     private final MovieItemRepository movieItemRepository;
 
-    @PostMapping
-    public MovieItemDto create(@RequestBody MovieItemDto movieItem) {    //TODO: check parameter -> MovieItem
+    @PostMapping("/create")
+    public MovieItemDto create(@RequestBody MovieItemDto movieItem) {
         movieItem.setId(0);  //to not update existing movie
-
-        return movieItemMapper.movieItemToDto(movieItemRepository.save(
-                movieItemMapper.dtoToMovieItem(movieItem)));
+        return movieItemMapper.movieItemToDto(movieItemService.addMovie(movieItemMapper.dtoToMovieItem(movieItem)));
     }
 
-    @GetMapping
+    @GetMapping("/findAll")
     public List<MovieItemDto> findAll() {
         return movieItemMapper.movieItemstoDtos(movieItemRepository.findAll());
     }
-
-//    @GetMapping("/{id}")
-//    public ResponseEntity<MovieItemDto> findById(@PathVariable int id) {  //ResponseEntity -> spring mvc specific type that can encapsulate entity response body
-//        Optional<MovieItem> movieItemOptional = movieItemRepository.findById(id);
-//        if(movieItemOptional.isPresent()) {
-//            return ResponseEntity.ok(movieItemMapper.movieItemToDto(movieItemOptional.get()));
-//        } else {
-//            return ResponseEntity.notFound().build();
-//        }
-//    }
 
     @GetMapping("/{id}")
     public MovieItemDto findById(@PathVariable int id) {
@@ -57,7 +48,6 @@ public class MovieItemController {
     @PutMapping("/{id}")
     public MovieItemDto update(@PathVariable int id, @RequestBody MovieItemDto movieItemDto) {
         movieItemDto.setId(id);  //to make sure we're updating that one movie
-
         return movieItemMapper.movieItemToDto(movieItemRepository.save(
                 movieItemMapper.dtoToMovieItem(movieItemDto)));
     }

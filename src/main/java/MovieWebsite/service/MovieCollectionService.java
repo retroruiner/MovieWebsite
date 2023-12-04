@@ -24,9 +24,8 @@ public class MovieCollectionService {
         return collection.getMovies().contains(movie);
     }
 
-    private UserAccount fetchUser(int userID) {
-        Optional<UserAccount> userOptional = userRepository.findById(userID);
-        return userOptional.orElseThrow(() -> new IllegalArgumentException("User not found"));
+    private UserAccount fetchUser(String authToken) {
+       return userRepository.findByAuthToken(authToken);
     }
 
     private MovieItem fetchMovie(String movieName) {
