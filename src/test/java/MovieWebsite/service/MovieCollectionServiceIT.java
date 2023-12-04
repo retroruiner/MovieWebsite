@@ -53,7 +53,7 @@ public class MovieCollectionServiceIT {
         movieCollectionRepository.save(movieCollection);
 
         //add
-        movieCollectionService.addMovieToCollection(userAccount.getId(), movieItem.getTitle(), movieCollection.getName());
+        movieCollectionService.addMovieToCollection(userAccount.getAuthToken(), movieItem.getTitle(), movieCollection.getName());
 
         MovieCollection collectionWithMovie = movieCollectionRepository.findByNameAndUserAccount(movieCollection.getName(), userAccount)
                 .orElseThrow(() -> new RuntimeException("Collection not found"));
@@ -64,7 +64,7 @@ public class MovieCollectionServiceIT {
 
 
         //remove
-        movieCollectionService.removeMovieFromCollection(userAccount.getId(), movieItem.getTitle(), movieCollection.getName());
+        movieCollectionService.removeMovieFromCollection(userAccount.getAuthToken(), movieItem.getTitle(), movieCollection.getName());
 
         // Verify that the movie is not in the collection anymore
         MovieCollection collectionWithoutMovie = movieCollectionRepository.findByNameAndUserAccount(movieCollection.getName(), userAccount)
@@ -78,7 +78,7 @@ public class MovieCollectionServiceIT {
         userRepository.save(userAccount);
 
         //Create
-        movieCollectionService.createNewCollection(userAccount.getId(), "Test New Collection");
+        movieCollectionService.createNewCollection(userAccount.getAuthToken(), "Test New Collection");
 
         Optional<MovieCollection> movieCollection = movieCollectionRepository.findByNameAndUserAccount("Test New Collection", userAccount);
         assertNotNull(movieCollection.get());
@@ -87,10 +87,10 @@ public class MovieCollectionServiceIT {
         //Testing with non-empty collection
         MovieItem movieItem = generateMovieItem();
         movieItemRepository.save(movieItem);
-        movieCollectionService.addMovieToCollection(userAccount.getId(), movieItem.getTitle(), "Test New Collection");
+        movieCollectionService.addMovieToCollection(userAccount.getAuthToken(), movieItem.getTitle(), "Test New Collection");
 
         //Delete
-        movieCollectionService.deleteCollection(userAccount.getId(), "Test New Collection");
+        movieCollectionService.deleteCollection(userAccount.getAuthToken(), "Test New Collection");
 
         Optional<MovieCollection> deletedMovieCollection = movieCollectionRepository.findByNameAndUserAccount("Test New Collection", userAccount);
         assertTrue(deletedMovieCollection.isEmpty());

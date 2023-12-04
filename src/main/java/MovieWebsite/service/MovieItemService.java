@@ -30,11 +30,11 @@ public class MovieItemService {
     private final UserRepository userRepository;
 
     @Transactional
-    public void addMovie(MovieItem movieItem) {
+    public MovieItem addMovie(MovieItem movieItem) {
         if(isMovieExistent(movieItem.getTitle())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Movie " + movieItem.getTitle() + " already exist");
         }
-        movieItemRepository.save(movieItem);
+        return movieItemRepository.save(movieItem);
     }
 
     private boolean isMovieExistent(String movieName) {
@@ -42,13 +42,17 @@ public class MovieItemService {
     }
 
     @Transactional
-    public void updateRating(int movieId, float rating) {
-        Optional<MovieItem> movieItemFromDB = movieItemRepository.findById(movieId);
-        MovieItem movieItem = movieItemFromDB.get();
-        float newRating = calculateRating(movieItem.getRating(), movieItem.getNumOfUsersVoted(), rating);
-        movieItem.setRating(newRating);
-        //movieItemRepository.save(movieItem);
-
+    public float addRating(int movieId, String authToken, float rating) {
+        MovieItem movieItem = fetchMovie(movieId);
+        UserAccount userAccount = fetchUser(authToken);
+        if(!userAccount.getRatedMovies().contains(movieItem)) {
+            float newRating = calculateRating(movieItem.getRating(), movieItem.getNumOfUsersVoted(), rating);
+            updateMovieRating(movieItem, newRating);
+            addUserRatedMovie(userAccount, movieItem);
+            return newRating;
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already rated this movie");
+        }
     }
 
     private void updateMovieRating(MovieItem movieItem, float newRating) {

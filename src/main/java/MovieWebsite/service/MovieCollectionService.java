@@ -42,19 +42,20 @@ public class MovieCollectionService {
     }
 
     @Transactional
-    public void createNewCollection(int userID, String collectionName) {
-        UserAccount userAccount = fetchUser(userID);
+    public MovieCollection createNewCollection(String authToken, String collectionName) {
+        UserAccount userAccount = fetchUser(authToken);
         MovieCollection movieCollection = new MovieCollection(collectionName, userAccount);
         if(!isUserCollectionExistent(userAccount, movieCollection.getName())) {
             movieCollectionRepository.save(movieCollection);
         } else {
             throw new RuntimeException("Collection with name " + collectionName + " exists");
         }
+        return movieCollection;
     }
 
     @Transactional
-    public void addMovieToCollection(int userId, String movieName, String collectionName) {
-        UserAccount userAccount = fetchUser(userId);
+    public void addMovieToCollection(String authToken, String movieName, String collectionName) {
+        UserAccount userAccount = fetchUser(authToken);
         MovieItem movie = fetchMovie(movieName);
         MovieCollection movieCollection = fetchCollection(userAccount, collectionName);
         if(isMovieInCollection(movieCollection, movie)) {
@@ -65,8 +66,8 @@ public class MovieCollectionService {
     }
 
     @Transactional
-    public void removeMovieFromCollection(int userId, String movieName, String collectionName) {
-        UserAccount userAccount = fetchUser(userId);
+    public void removeMovieFromCollection(String authToken, String movieName, String collectionName) {
+        UserAccount userAccount = fetchUser(authToken);
         MovieItem movie = fetchMovie(movieName);
         MovieCollection movieCollection = fetchCollection(userAccount, collectionName);
         if(!isMovieInCollection(movieCollection, movie)) {
@@ -77,9 +78,10 @@ public class MovieCollectionService {
     }
 
     @Transactional
-    public void deleteCollection(int userID, String collectionName) {
-        UserAccount userAccount = fetchUser(userID);
+    public void deleteCollection(String authToken, String collectionName) {
+        UserAccount userAccount = fetchUser(authToken);
         MovieCollection movieCollection = fetchCollection(userAccount, collectionName);
         movieCollectionRepository.delete(movieCollection);
     }
+
 }
