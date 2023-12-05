@@ -6,61 +6,38 @@ import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.UserRepository;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.Random;
 
+
+@Service
+@RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
-    private MovieCollectionService movieCollectionService;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    public void registerUser(UserRegistrationData userRegistrationData) {
-        validateUserDoesNotExist(userRegistrationData.email, userRegistrationData.nickname);
-        UserAccount userAccount = createUserAccount(userRegistrationData);
-        userRepository.createUserAccount(userAccount);
+    @Transactional
+    public UserAccount registerUser(UserAccount userAccount) {
+        validateUserDoesNotExist(userAccount.getEmail(), userAccount.getNickname());
+        return userRepository.save(userAccount);
     }
 
     private void validateUserDoesNotExist(String email, String nickname) {
         if (userRepository.findByEmail(email) != null || userRepository.findByNickname(nickname) != null) {
-            throw new IllegalArgumentException("User with the given credentials already exists");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User with email " + email + " or nickname " + nickname + " already exists.");
         }
     }
-    private UserAccount createUserAccount(UserRegistrationData userRegistrationData) {
-        return UserAccount.builder()
-                .id(generateRandomId())
-                .fullName(userRegistrationData.fullName)
-                .nickname(userRegistrationData.nickname)
-                .password(userRegistrationData.password)
-                .email(userRegistrationData.email)
-                .dateOfBirth(userRegistrationData.dateOfBirth)
-                .build();
-    }
 
-    private int generateRandomId() {
-        Random random = new Random();
-        int id;
-        do {
-            id = 100000 + random.nextInt(999999);
-        } while (!isUserIdAvailable(id));
-        return id;
-    }
-
-    private boolean isUserIdAvailable(int id) {
-        UserAccount existingUser = userRepository.findByUserID(id);
-        return existingUser == null;
-    }
-
-    public void setProfilePicture(UserAccount user, String imageUrl) {
-        //TODO: set PFP
-    }
     public void sendFriendRequest(UserAccount sender, UserAccount receiver){
-        //TODO: Friend request
+
     }
     public void acceptFriendRequest(UserAccount user, UserAccount friend) {
         //TODO: Accept friend request
@@ -69,6 +46,7 @@ public class UserService {
         //TODO: Delete friend
     }
 
+    @Getter
     @Builder
     public static class UserRegistrationData {
         private String fullName;
