@@ -20,7 +20,7 @@ public class UserAuthService {
     private final UserRepository userRepository;
 
     @Transactional
-    public String generateAuthToken(UserAccount userAccount) {
+    public String generateAuthToken(UserAccount userAccount) {  //TODO: jwt token
         byte[] tokenBytes = new byte[32];
         new SecureRandom().nextBytes(tokenBytes);
         return Base64.getEncoder().encodeToString(tokenBytes);
