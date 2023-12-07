@@ -26,14 +26,12 @@ public class UserService {
 
     @Transactional
     public UserAccount registerUser(UserAccount userAccount) {
-        validateUserDoesNotExist(userAccount.getEmail(), userAccount.getNickname());
-        return userRepository.save(userAccount);
-    }
-
-    private void validateUserDoesNotExist(String email, String nickname) {
-        if (userRepository.findByEmail(email) != null || userRepository.findByNickname(nickname) != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "User with email " + email + " or nickname " + nickname + " already exists.");
+        if (userRepository.findByEmail(userAccount.getEmail()) != null
+                || userRepository.findByNickname(userAccount.getNickname()) != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User with email " + userAccount.getEmail()
+                    + " or nickname " + userAccount.getNickname() + " already exists.");
         }
+        return userRepository.save(userAccount);
     }
 
     public void sendFriendRequest(UserAccount sender, UserAccount receiver){

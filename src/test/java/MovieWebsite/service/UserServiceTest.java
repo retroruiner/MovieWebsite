@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,32 +31,11 @@ public class UserServiceTest {
 
     @Test
     public void testRegisterUser_Success() {
-        // Given
-        calendar.set(2003, Calendar.NOVEMBER, 19);
-        Date date = calendar.getTime();
-
-        UserService.UserRegistrationData userRegistrationData = UserService.UserRegistrationData.builder()
-                .fullName("Eliza Johnson")
-                .email("eliza@gmail.com")
-                .nickname("LizzyWizzy")
-                .password("some_password")
-                .dateOfBirth(java.sql.Date.valueOf("2020-01-09"))
-                .build();
-
-
-        UserAccount userAccount = UserAccount.builder()
-                .fullName(userRegistrationData.getFullName())
-                .nickname(userRegistrationData.getNickname())
-                .password(userRegistrationData.getPassword())
-                .email(userRegistrationData.getEmail())
-                .dateOfBirth(userRegistrationData.getDateOfBirth())
-                .build();
-
-
+        UserAccount userAccount = generateUser();
 
         //Set environment such that such user does not exist
-        Mockito.when(userRepository.findByEmail(userRegistrationData.getEmail())).thenReturn(null);
-        Mockito.when(userRepository.findByNickname(userRegistrationData.getNickname())).thenReturn(null);
+        Mockito.when(userRepository.findByEmail(userAccount.getEmail())).thenReturn(null);
+        Mockito.when(userRepository.findByNickname(userAccount.getNickname())).thenReturn(null);
 
         // When
         userService.registerUser(userAccount);
@@ -63,17 +43,24 @@ public class UserServiceTest {
         System.out.println(userAccount.getDateOfBirth());
 
         // Then
-        //verify(userRepository, times(1)).save(userAccount);
         verify(userRepository, times(1)).save(userAccount);
 
     }
 
     @Test
     public void testRegisterUser_Fail() {
-        // Given
-        //calendar.set(2003, Calendar.NOVEMBER, 19);
-        //Date date = calendar.getTime();
+        UserAccount userAccount = generateUser();
 
+        //Set environment such that such user already exists
+        Mockito.lenient().when(userRepository.findByEmail(userAccount.getEmail())).thenReturn(userAccount);
+        Mockito.lenient().when(userRepository.findByNickname(userAccount.getNickname())).thenReturn(userAccount);
+
+        assertThrows(ResponseStatusException.class, () -> userService.registerUser(userAccount));
+
+        verify(userRepository, never()).save(Mockito.any(UserAccount.class));
+    }
+
+    private UserAccount generateUser() {
         UserService.UserRegistrationData userRegistrationData = UserService.UserRegistrationData.builder()
                 .fullName("Eliza Johnson")
                 .email("eliza@gmail.com")
@@ -89,15 +76,6 @@ public class UserServiceTest {
                 .email(userRegistrationData.getEmail())
                 .dateOfBirth(userRegistrationData.getDateOfBirth())
                 .build();
-
-
-        //TODO: remove lenient()
-        //Set environment such that such user already exists
-        Mockito.lenient().when(userRepository.findByEmail(userRegistrationData.getEmail())).thenReturn(userAccount);
-        Mockito.lenient().when(userRepository.findByNickname(userRegistrationData.getNickname())).thenReturn(userAccount);
-
-        assertThrows(IllegalArgumentException.class, () -> userService.registerUser(userAccount));
-
-        verify(userRepository, never()).save(Mockito.any(UserAccount.class));
+        return userAccount;
     }
 }
