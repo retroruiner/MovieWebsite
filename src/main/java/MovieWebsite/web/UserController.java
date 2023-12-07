@@ -18,7 +18,6 @@ import java.util.List;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserRepository userRepository;
     private final UserService userService;
     private final UserAuthService userAuthService;
@@ -57,6 +56,7 @@ public class UserController {
 
     @GetMapping("/findAll")
     public List<UserAccountDto> findAll() {
+        System.out.println("LOLSFKSFISHFSHFHFSJHFSHFSHFSHHFHSFJSHJSFHSK");
         return userAccountMapper.usersToDtos(userRepository.findAll());
     }
 
