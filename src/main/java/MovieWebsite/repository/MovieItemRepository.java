@@ -1,5 +1,6 @@
 package MovieWebsite.repository;
 
+import MovieWebsite.model.Genre;
 import MovieWebsite.model.MovieItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -23,7 +24,7 @@ public interface MovieItemRepository extends JpaRepository<MovieItem, Integer> {
 
     Iterable<MovieItem> findByTitleContainingIgnoreCase(String title);
 
-    List<MovieItem> findByGenreListContainsIgnoreCase(String genre);
+    List<MovieItem> findByGenreListContainsIgnoreCase(Genre genre);
 
     List<MovieItem> findByRatingGreaterThanEqual(float minRating);
 }

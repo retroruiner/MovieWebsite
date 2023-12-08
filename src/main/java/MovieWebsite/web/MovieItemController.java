@@ -1,10 +1,13 @@
 package MovieWebsite.web;
 
+import MovieWebsite.GenreMapper;
 import MovieWebsite.MovieItemMapper;
 import MovieWebsite.UserAccountMapper;
+import MovieWebsite.dto.GenreDto;
 import MovieWebsite.dto.MovieItemDto;
 import MovieWebsite.dto.RatingUpdateRequestDto;
 import MovieWebsite.dto.UserAccountDto;
+import MovieWebsite.model.Genre;
 import MovieWebsite.model.MovieItem;
 import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.service.FilterService;
@@ -29,6 +32,7 @@ public class MovieItemController {
     private final UserAccountMapper userAccountMapper;
     private final SearchService searchService;
     private final FilterService filterService;
+    private final GenreMapper genreMapper;
 
     @PostMapping("/create")
     public MovieItemDto create(@RequestBody MovieItemDto movieItem) {
@@ -66,22 +70,22 @@ public class MovieItemController {
     }
 
     @GetMapping("/simpleSearch")  //TODO: check api search
-    public List<MovieItem> simpleSearch(@RequestParam String searchTerm) {
-        return searchService.simpleSearch(searchTerm);
+    public List<MovieItemDto> simpleSearch(@RequestParam String searchTerm) {
+        return movieItemMapper.movieItemstoDtos(searchService.simpleSearch(searchTerm));
     }
 
     @GetMapping("/advancedSearch") //TODO: check api search
-    public List<MovieItem> advancedSearch(@RequestParam String searchTerm) {
-        return searchService.advancedSearch(searchTerm);
+    public List<MovieItemDto> advancedSearch(@RequestParam String searchTerm) {
+        return movieItemMapper.movieItemstoDtos(searchService.advancedSearch(searchTerm));
     }
 
     @GetMapping("/filterByGenre")
-    public List<MovieItem> filterByGenre(@RequestParam String genre) {
-        return filterService.filterByGenre(genre);
+    public List<MovieItemDto> filterByGenre(@RequestParam GenreDto genre) {
+        return movieItemMapper.movieItemstoDtos(filterService.filterByGenre(genreMapper.dtoToGenre(genre)));
     }
 
     @GetMapping("/filterByRatings")   //   "/api/movies/filterByRatings?minRating=3.5"
-    public List<MovieItem> filterByRatings(@RequestParam float minRating) {
-        return filterService.filterByRatings(minRating);
+    public List<MovieItemDto> filterByRatings(@RequestParam float minRating) {
+        return movieItemMapper.movieItemstoDtos(filterService.filterByRatings(minRating));
     }
 }

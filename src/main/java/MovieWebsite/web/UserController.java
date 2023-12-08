@@ -18,7 +18,6 @@ import java.util.List;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
-
     private final UserRepository userRepository;
     private final UserService userService;
     private final UserAuthService userAuthService;
@@ -55,8 +54,22 @@ public class UserController {
         userRepository.deleteByAuthToken(userAccountDto.getAuthToken());
     }
 
+    @PutMapping("/user/{id}")
+    public UserAccountDto updateUser(@RequestBody UserAccountDto newUser, @PathVariable int id) {
+        return userAccountMapper.userToDto(userRepository.findById(id)
+                .map(user -> {
+                    user.setFullName(newUser.getFullName());
+                    user.setNickname(newUser.getNickname());
+                    user.setEmail(newUser.getEmail());
+                    user.setDateOfBirth(newUser.getDateOfBirth());
+                    user.setPassword(newUser.getPassword());
+                    return userRepository.save(user);
+                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
+    }
+
     @GetMapping("/findAll")
     public List<UserAccountDto> findAll() {
+        System.out.println("LOLSFKSFISHFSHFHFSJHFSHFSHFSHHFHSFJSHJSFHSK");
         return userAccountMapper.usersToDtos(userRepository.findAll());
     }
 

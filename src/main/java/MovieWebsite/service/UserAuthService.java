@@ -19,27 +19,18 @@ import java.util.Optional;
 public class UserAuthService {
     private final UserRepository userRepository;
 
-    @Transactional
-    public String generateAuthToken(UserAccount userAccount) {
+    private String generateAuthToken() {
         byte[] tokenBytes = new byte[32];
         new SecureRandom().nextBytes(tokenBytes);
         return Base64.getEncoder().encodeToString(tokenBytes);
     }
 
-    public boolean verifyAuthToken(String authToken) {
+    private boolean verifyAuthToken(String authToken) {
         UserAccount userAccount = userRepository.findByAuthToken(authToken);
         return userAccount != null;
     }
 
-    @Transactional
-    public void invalidateAuthToken(String authToken) {
-        UserAccount userAccount = userRepository.findByAuthToken(authToken);
-        if (userAccount != null) {
-            userAccount.setAuthToken(null);
-        }
-    }
-
-    public UserAccount authenticateUser(String nickname, String password) {
+    private UserAccount authenticateUser(String nickname, String password) {
         UserAccount userAccount = userRepository.findByNickname(nickname);
 
         System.out.println(Objects.equals(userAccount.getPassword(), password));
@@ -54,7 +45,7 @@ public class UserAuthService {
     public String loginUser(String nickname, String password) {
         UserAccount userAccount = authenticateUser(nickname, password);
         if (userAccount != null) {
-            String authToken = generateAuthToken(userAccount);
+            String authToken = generateAuthToken();
             updateUserStatus(userAccount, authToken, true);
             return authToken;
         } else {
@@ -77,6 +68,7 @@ public class UserAuthService {
         }
         return false;
     }
+
     private UserAccount fetchUser(int userID) {
         Optional<UserAccount> userOptional = userRepository.findById(userID);
         return userOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User does not exist"));

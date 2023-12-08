@@ -1,8 +1,10 @@
 package MovieWebsite;
 
 import MovieWebsite.dto.MovieCollectionDto;
+import MovieWebsite.dto.MovieItemDto;
 import MovieWebsite.dto.UserAccountDto;
 import MovieWebsite.model.MovieCollection;
+import MovieWebsite.model.MovieItem;
 import MovieWebsite.model.UserAccount;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,5 +21,8 @@ public interface UserAccountMapper {
 
     @Mapping(target = "userAccountDto", ignore = true)
     MovieCollectionDto movieCollectionToDto(MovieCollection collection);
+    
+    @Mapping(target = "ratedByUsers", ignore = true)
+    MovieItemDto movieItemToDto(MovieItem movieItem);
 
 }

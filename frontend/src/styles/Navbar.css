@@ -1,0 +1,88 @@
+/* Navbar.css */
+
+.navbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    background-color: #060b17;
+    padding: 10px;
+  }
+  
+  .rightSide {
+    margin-left: auto;
+    padding-right: 160px; /* Add padding to the right side of the navbar */
+  }
+
+  .navbar .leftSide {
+    padding-left: 100px;
+  }
+
+  .leftSide img {
+    width: 55px; /* Adjust this value to make the image smaller */
+    margin-right: 20px; /* Add some space between the image and the links */
+   }
+  
+  .rightSide a {
+    margin-right: 20px;
+    color: #cac9d1;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .rightSide input[type="text"] {
+    margin-right: 20px;
+    padding: 5px;
+    border: none;
+    width: 400px;
+    height: 25px;
+    background-color: #000;
+    color: #fff;
+   }
+  
+  .rightSide a:hover {
+    color: #ff0000;
+  }
+
+  .dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #060b17;
+    min-width: 160px;
+    z-index: 1;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .dropdown-content a:hover {
+    background-color: #171f30;
+  }
+  
+  .dropdown:hover .dropdown-content {
+    display: block;
+  }
+  
+  /* Clear the floats */
+  .clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+  
+
+   
+ 
+  
+
+ 
+ 

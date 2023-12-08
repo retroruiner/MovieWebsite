@@ -1,5 +1,6 @@
 package MovieWebsite.dto;
 
+import MovieWebsite.model.MovieItem;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,4 +22,5 @@ public class UserAccountDto {
     private List<MovieCollectionDto> listOfCollections = new ArrayList<>();
     private List<UserAccountDto> friendList = new ArrayList<>();
     private List<MovieItemDto> ratedMovies = new ArrayList<>();
+
 }

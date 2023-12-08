@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -52,7 +53,7 @@ public class UserAuthServiceIT {
         UserAccount testUser = generateUserAccount();
         userService.registerUser(testUser);
 
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(ResponseStatusException.class, () ->
                 userAuthService.loginUser(testUser.getNickname(), "incorrectPassword"));
 
         // Ensure that no user is logged in and no authentication token is generated
@@ -72,7 +73,7 @@ public class UserAuthServiceIT {
         userAuthService.loginUser(testUser.getNickname(), testUser.getPassword());
 
         //logout
-//        userAuthService.logoutUser(testUser.getId());
+        userAuthService.logoutUser(testUser.getAuthToken());
 
         Optional<UserAccount> logoutUserOptional = userRepository.findById(testUser.getId());
         UserAccount logoutUser = logoutUserOptional.get();
@@ -85,37 +86,9 @@ public class UserAuthServiceIT {
     @Transactional
     void testLogoutNonexistentUser() {
         UserAccount userAccount = null;
-        // Attempt to logout a nonexistent user
-//        assertThrows(NullPointerException.class, () ->
-//                userAuthService.logoutUser(userAccount.getId()));
-    }
-
-    @Test
-    @Transactional
-    void testGenerateAndInvalidateAuthToken() {
-        UserAccount testUser = generateUserAccount();
-        userService.registerUser(testUser);
-
-        System.out.println("Before generating auth token: " + userRepository.findByNickname(testUser.getNickname()));
-
-        String authToken = userAuthService.generateAuthToken(testUser);
-
-        System.out.println("Generated auth Token: " + authToken);
-
-        // Verify that the user has the generated auth token
-        UserAccount userWithAuthToken = userRepository.findByNickname(testUser.getNickname());
-        assertNotNull(userWithAuthToken);
-        assertEquals(authToken, userWithAuthToken.getAuthToken());
-
-        // Invalidate the auth token
-        userAuthService.invalidateAuthToken(authToken);
-
-        System.out.println("After invalidating auth token: " + userRepository.findByNickname(testUser.getNickname()));
-
-        // Verify that the user's auth token is null after invalidation
-        UserAccount userAfterInvalidation = userRepository.findByNickname(testUser.getNickname());
-        assertNotNull(userAfterInvalidation);
-        assertNull(userAfterInvalidation.getAuthToken());
+         //Attempt to logout a nonexistent user
+        assertThrows(NullPointerException.class, () ->
+                userAuthService.logoutUser(userAccount.getAuthToken()));
     }
 
     private UserAccount generateUserAccount() {

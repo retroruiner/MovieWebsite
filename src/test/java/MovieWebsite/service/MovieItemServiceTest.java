@@ -4,6 +4,8 @@ import MovieWebsite.model.Genre;
 import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.model.MovieItem;
+import MovieWebsite.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -34,22 +37,28 @@ public class MovieItemServiceTest {
     @Mock
     MovieItemRepository movieItemRepository;
 
+    @Mock
+    UserRepository userRepository;
+
     @Test
     public void testUpdateRating() {
         MovieItem movieItem = generateMovieItem();
+        UserAccount userAccount = generateUserAccount();
 
         float newRate = 9;
         int numVotes = 2;
         movieItem.setNumOfUsersVoted(numVotes);
         float expected = (movieItem.getRating() * numVotes + newRate) / (++numVotes);
 
+        Mockito.when(userRepository.findByAuthToken(userAccount.getAuthToken())).thenReturn(userAccount);
         Mockito.when(movieItemRepository.findById(movieItem.getId())).thenReturn(Optional.of(movieItem));
 
         //update rating
-        movieItemService.updateRating(movieItem.getId(), newRate);
+        float resultRating = movieItemService.addRating(movieItem.getId(), userAccount.getAuthToken(), newRate);
 
         verify(movieItemRepository, times(1)).findById(movieItem.getId());
-        assertEquals(expected, movieItem.getRating());
+        assertEquals(expected, resultRating);
+        assertTrue(userAccount.getRatedMovies().contains(movieItem));
 
     }
 
@@ -96,5 +105,23 @@ public class MovieItemServiceTest {
                 .build();
 
         return movieItem;
+    }
+
+    private UserAccount generateUserAccount() {
+        UserService.UserRegistrationData data = UserService.UserRegistrationData.builder()
+                .fullName("Eliza Johnson")
+                .email("eliza@gmail.com")
+                .nickname("LizzyWizzy")
+                .password("some_password")
+                .dateOfBirth(java.sql.Date.valueOf("2020-01-09"))
+                .build();
+
+        return UserAccount.builder()
+                .fullName(data.getFullName())
+                .nickname(data.getNickname())
+                .password(data.getPassword())
+                .email(data.getEmail())
+                .dateOfBirth(data.getDateOfBirth())
+                .build();
     }
 }

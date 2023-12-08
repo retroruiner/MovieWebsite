@@ -23,6 +23,7 @@ public class SearchService {
         return movieItemList;
     }
 
+    @Transactional
     public List<MovieItem> advancedSearch(String searchTerm) {
         List<MovieItem> allMovies = movieItemRepository.findAll();
 
