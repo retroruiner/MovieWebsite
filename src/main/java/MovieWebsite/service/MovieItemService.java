@@ -34,6 +34,7 @@ public class MovieItemService {
         if(isMovieExistent(movieItem.getTitle())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Movie " + movieItem.getTitle() + " already exist");
         }
+        System.out.println(movieItem.getImage());
         return movieItemRepository.save(movieItem);
     }
 

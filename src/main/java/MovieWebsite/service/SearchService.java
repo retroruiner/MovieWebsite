@@ -16,10 +16,16 @@ public class SearchService {
 
     @Transactional
     public List<MovieItem> simpleSearch(String searchTerm) {
-        List<MovieItem> movieItemList = new ArrayList<>();
-        for (MovieItem movieItem : movieItemRepository.findByTitleContainingIgnoreCase(searchTerm)) {
-            movieItemList.add(movieItem);
-        }
+//        List<MovieItem> movieItemList = new ArrayList<>();
+        List<MovieItem> movieItemList = movieItemRepository.findByTitleContainingIgnoreCase(searchTerm);
+//        for (MovieItem movieItem : ) {
+//            movieItemList.add(movieItem);
+//        }
+
+//        for (MovieItem movieItem : movieItemList) {
+//            System.out.println(movieItem.is);
+//        }
+        System.out.println(movieItemList.isEmpty());
         return movieItemList;
     }
 

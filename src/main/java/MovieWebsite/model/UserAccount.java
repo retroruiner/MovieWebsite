@@ -25,9 +25,8 @@ public class UserAccount {
     private String email;
     private String password;
     private boolean loggedIn;
-    private String authToken; //TODO: change location of Token, not safe now
+    private String authToken;
 
-    //TODO: Implement hashing algorithm
 
     @Builder.Default
     @OneToMany(mappedBy = "userAccount")

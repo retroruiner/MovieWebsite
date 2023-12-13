@@ -28,8 +28,8 @@ public class MovieCollectionService {
        return userRepository.findByAuthToken(authToken);
     }
 
-    private MovieItem fetchMovie(String movieName) {
-        return movieItemRepository.findByTitle(movieName).orElseThrow(() -> new RuntimeException("Movie " + movieName + " does not exist"));
+    private MovieItem fetchMovie(int movieId) {
+        return movieItemRepository.findById(movieId).orElseThrow(() -> new RuntimeException("Movie with id " + movieId + " does not exist"));
     }
 
     private boolean isUserCollectionExistent(UserAccount userAccount, String collectionName) {
@@ -44,6 +44,7 @@ public class MovieCollectionService {
     @Transactional
     public MovieCollection createNewCollection(String authToken, String collectionName) {
         UserAccount userAccount = fetchUser(authToken);
+//        System.out.println(userAccount.getId());
         MovieCollection movieCollection = new MovieCollection(collectionName, userAccount);
         if(!isUserCollectionExistent(userAccount, movieCollection.getName())) {
             movieCollectionRepository.save(movieCollection);
@@ -54,27 +55,27 @@ public class MovieCollectionService {
     }
 
     @Transactional
-    public void addMovieToCollection(String authToken, String movieName, String collectionName) {
+    public MovieCollection addMovieToCollection(String authToken, int movieId, String collectionName) {
         UserAccount userAccount = fetchUser(authToken);
-        MovieItem movie = fetchMovie(movieName);
+        MovieItem movie = fetchMovie(movieId);
         MovieCollection movieCollection = fetchCollection(userAccount, collectionName);
         if(isMovieInCollection(movieCollection, movie)) {
-            throw new RuntimeException("Movie already in collection: " + movieName);
+            throw new RuntimeException("Movie already in collection: " + movie.getTitle());
         }
         movieCollection.getMovies().add(movie);
-        movieCollectionRepository.save(movieCollection);
+        return movieCollectionRepository.save(movieCollection);
     }
 
     @Transactional
-    public void removeMovieFromCollection(String authToken, String movieName, String collectionName) {
+    public MovieCollection removeMovieFromCollection(String authToken, int movieId, String collectionName) {
         UserAccount userAccount = fetchUser(authToken);
-        MovieItem movie = fetchMovie(movieName);
+        MovieItem movie = fetchMovie(movieId);
         MovieCollection movieCollection = fetchCollection(userAccount, collectionName);
         if(!isMovieInCollection(movieCollection, movie)) {
-            throw new RuntimeException("No movie in collection: " + movieName);
+            throw new RuntimeException("No movie in collection: " + movie.getTitle());
         }
         movieCollection.getMovies().remove(movie);
-        movieCollectionRepository.save(movieCollection);
+        return movieCollectionRepository.save(movieCollection);
     }
 
     @Transactional

@@ -22,7 +22,7 @@ public interface MovieItemRepository extends JpaRepository<MovieItem, Integer> {
     @Query("SELECT m.numOfUsersVoted FROM MovieItem m WHERE m.id = ?1")
     Integer findVotedUsersById(int movieId);
 
-    Iterable<MovieItem> findByTitleContainingIgnoreCase(String title);
+    List<MovieItem> findByTitleContainingIgnoreCase(String title);
 
     List<MovieItem> findByGenreListContainsIgnoreCase(Genre genre);
 

@@ -69,7 +69,7 @@ public class MovieItemController {
         return movieItemService.addRating(id, rating.getAuthToken(), rating.getRating());
     }
 
-    @GetMapping("/simpleSearch")  //TODO: check api search
+    @GetMapping("/simpleSearch")
     public List<MovieItemDto> simpleSearch(@RequestParam String searchTerm) {
         return movieItemMapper.movieItemstoDtos(searchService.simpleSearch(searchTerm));
     }
@@ -80,8 +80,10 @@ public class MovieItemController {
     }
 
     @GetMapping("/filterByGenre")
-    public List<MovieItemDto> filterByGenre(@RequestParam GenreDto genre) {
-        return movieItemMapper.movieItemstoDtos(filterService.filterByGenre(genreMapper.dtoToGenre(genre)));
+    public List<MovieItemDto> filterByGenre(@RequestParam String genreName) {
+        Genre genre = Genre.valueOf(genreName.toUpperCase());
+        return movieItemMapper.movieItemstoDtos(movieItemRepository
+                .findByGenreListContainsIgnoreCase(genre));
     }
 
     @GetMapping("/filterByRatings")   //   "/api/movies/filterByRatings?minRating=3.5"

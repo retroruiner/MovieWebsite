@@ -20,6 +20,8 @@ public class MovieItemDto {
     private String director;
     private String countryOfOrigin;
     private Date releaseDate;
+    private String image;
     private List<GenreDto> genreList = new ArrayList<>();
     private List<UserAccountDto> ratedByUsers = new ArrayList<>();
+
 }
