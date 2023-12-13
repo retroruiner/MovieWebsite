@@ -3,6 +3,8 @@ package MovieWebsite.web;
 import MovieWebsite.MovieCollectionMapper;
 import MovieWebsite.UserAccountMapper;
 import MovieWebsite.dto.MovieCollectionDto;
+import MovieWebsite.dto.NewCollectionDataDto;
+import MovieWebsite.dto.RatingUpdateRequestDto;
 import MovieWebsite.dto.UserAccountDto;
 import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.MovieCollectionRepository;
@@ -23,18 +25,25 @@ public class MovieCollectionController {
     private final UserAccountMapper userAccountMapper;
     private final MovieCollectionService movieCollectionService;
 
-    @PostMapping
-    public MovieCollectionDto create(@RequestBody MovieCollectionDto movieCollectionDto, @RequestBody UserAccountDto userAccountDto) {
-        movieCollectionDto.setId(0);  //to not update existing movie
-
-        return movieCollectionMapper.movieCollectionToDto(movieCollectionService.createNewCollection(
-                userAccountMapper.dtoToUser(userAccountDto).getAuthToken(),
-                movieCollectionMapper.dtoToMovieCollection(movieCollectionDto).getName()));
+    @PostMapping("/createCollection")
+    public MovieCollectionDto create(@RequestBody NewCollectionDataDto newCollectionData) {
+        System.out.println(newCollectionData.getAuthToken());
+        return movieCollectionMapper.movieCollectionToDto(movieCollectionService.createNewCollection(newCollectionData.getAuthToken(), newCollectionData.getCollectionName()));
     }
 
-    @GetMapping
-    public List<MovieCollectionDto> findAll() {
-        return movieCollectionMapper.movieCollectionsToDtos(movieCollectionRepository.findAll());
+    @PutMapping("/addMovie/{id}")
+    public MovieCollectionDto addMovieToCollection(@PathVariable int id, @RequestBody NewCollectionDataDto newCollectionData) {
+        return movieCollectionMapper.movieCollectionToDto(movieCollectionService.addMovieToCollection(newCollectionData.getAuthToken(), id, newCollectionData.getCollectionName()));
+    }
+
+    @DeleteMapping("/removeMovie/{id}")
+    public MovieCollectionDto removeMovieFromCollection(@PathVariable int id, @RequestBody NewCollectionDataDto newCollectionData) {
+        return movieCollectionMapper.movieCollectionToDto(movieCollectionService.removeMovieFromCollection(newCollectionData.getAuthToken(), id, newCollectionData.getCollectionName()));
+    }
+
+    @GetMapping("/findAll/{id}")
+    public List<MovieCollectionDto> findAll(@PathVariable int id) {
+        return movieCollectionMapper.movieCollectionsToDtos(movieCollectionRepository.findAllByUserId(id));
     }
 
     @GetMapping("/{id}")
@@ -43,19 +52,8 @@ public class MovieCollectionController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
-    @DeleteMapping("/{collectionName}")
-    public void delete(@PathVariable String collectionName, @RequestBody UserAccountDto userAccountDto) {
-        UserAccount user = userAccountMapper.dtoToUser(userAccountDto);
-        movieCollectionService.deleteCollection(user.getAuthToken(), collectionName);
+    @DeleteMapping("/deleteCollection")
+    public void delete(@RequestParam String collectionName, @RequestParam String authToken) {
+        movieCollectionService.deleteCollection(authToken, collectionName);
     }
-
-    @PutMapping("/{id}")
-    public MovieCollectionDto update(@PathVariable int id, @RequestBody MovieCollectionDto movieCollectionDto) {
-        movieCollectionDto.setId(id);  //to make sure we're updating that one movie
-
-        return movieCollectionMapper.movieCollectionToDto(movieCollectionRepository.save(
-                movieCollectionMapper.dtoToMovieCollection(movieCollectionDto)));
-    }
-
-
 }

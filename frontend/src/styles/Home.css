@@ -22,18 +22,18 @@
   font-size: 60px;
   height: 60px;
   font-weight: 50;
-  color: white; /* Change this to white */
+  color: white; 
 }
 
 .headerContainer p {
   padding: 0;
   font-size: 20px;
   font-weight: lighter;
-  color: white; /* Change this to white */
+  color: white;
 }
 
 .headerContainer button {
-  color: white; /* Change this to white */
+  color: white; 
   border: none;
   border-radius: 5px;
   cursor: pointer;

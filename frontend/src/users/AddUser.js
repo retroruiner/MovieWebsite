@@ -9,10 +9,11 @@ export default function AddUser() {
         fullName: "",
         nickname: "",
         email: "",
+        dateOfBirth: "",
         password: ""
     })
 
-    const { fullName, nickname, email, password } = user
+    const { fullName, nickname, email, dateOfBirth, password } = user
 
     const onInputChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value }); //keep on adding the user in state
@@ -21,6 +22,7 @@ export default function AddUser() {
     const onSubmit = async (e) => {
         e.preventDefault();  //prevent wierd url
         await axios.post("http://localhost:8080/api/users/register", user);
+
         navigate("/");  //Home
     };
 
@@ -30,7 +32,7 @@ export default function AddUser() {
                 <div className="col-md-6 offset-md-3 border rounded p-4 mt-2 shadow">
                     <h2 className="text-center m-4">Register User</h2>
 
-                    <form onSubmit={(e)=>onSubmit(e)}>
+                    <form onSubmit={(e) => onSubmit(e)}>
                         <div className="mb-3">
                             <label htmlFor="FullName" className="form-label">
                                 Name
@@ -69,6 +71,20 @@ export default function AddUser() {
                                 placeholder="Enter your email address"
                                 name="email"
                                 value={email}
+                                onChange={(e) => onInputChange(e)}
+                            />
+                        </div>
+
+                        <div className="mb-3">
+                            <label htmlFor="DateOfBirth" className="form-label">
+                                Date of Birth
+                            </label>
+                            <input
+                                type="date"
+                                className="form-control"
+                                placeholder="Enter your date of birth"
+                                name="dateOfBirth"
+                                value={dateOfBirth}
                                 onChange={(e) => onInputChange(e)}
                             />
                         </div>

@@ -29,6 +29,7 @@ public class MovieItem {
     private String director;
     private String countryOfOrigin;
     private Date releaseDate;
+    private String image;
 
     @ElementCollection(targetClass=Genre.class)
     @CollectionTable(name = "genres", joinColumns = @JoinColumn(name = "movie_item_id"))
