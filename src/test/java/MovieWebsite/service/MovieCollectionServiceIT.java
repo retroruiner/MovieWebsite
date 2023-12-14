@@ -10,7 +10,6 @@ import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -116,7 +115,8 @@ public class MovieCollectionServiceIT {
 
     private MovieItem generateMovieItem() {
         List<Genre> genreList = Arrays.asList(Genre.ACTION, Genre.COMEDY, Genre.DRAMA);
-        MovieItem movieItem = MovieItem.builder()
+
+        return MovieItem.builder()
                 .duration(23)
                 .rating(2)
                 .title("Love")
@@ -125,7 +125,5 @@ public class MovieCollectionServiceIT {
                 .releaseDate(java.sql.Date.valueOf("2009-01-09"))
                 .genreList(genreList)
                 .build();
-
-        return movieItem;
     }
 }

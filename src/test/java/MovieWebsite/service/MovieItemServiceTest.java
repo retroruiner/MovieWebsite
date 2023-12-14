@@ -5,7 +5,6 @@ import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.model.MovieItem;
 import MovieWebsite.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -95,7 +94,7 @@ public class MovieItemServiceTest {
                 genreList
         );
 
-        MovieItem movieItem = MovieItem.builder()
+        return MovieItem.builder()
                 .duration(movieItemData.getDuration())
                 .title(movieItemData.getTitle())
                 .director(movieItemData.getDirector())
@@ -103,8 +102,6 @@ public class MovieItemServiceTest {
                 .releaseDate(movieItemData.getReleaseDate())
                 .genreList(movieItemData.getGenreList())
                 .build();
-
-        return movieItem;
     }
 
     private UserAccount generateUserAccount() {
