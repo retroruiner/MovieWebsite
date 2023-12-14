@@ -3,6 +3,7 @@ package MovieWebsite.service;
 import MovieWebsite.model.Genre;
 import MovieWebsite.model.MovieItem;
 import MovieWebsite.repository.MovieItemRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -30,7 +31,9 @@ public class SearchFilterIT {
     MovieItemRepository movieItemRepository;
 
     @Test
+    @Transactional
     public void testSearch() {
+        generateMovies();
 
         //simpleSearch
         List<MovieItem> result1 = searchService.simpleSearch("ION");
@@ -48,7 +51,10 @@ public class SearchFilterIT {
     }
 
     @Test
+    @Transactional
     public void testFilter() {
+        generateMovies();
+
         List<MovieItem> result1 = filterService.filterByGenre(Genre.ACTION);
         assertEquals(2, result1.size());
 
@@ -74,13 +80,13 @@ public class SearchFilterIT {
         MovieItem movieItem2 = new MovieItem();
         movieItem2.setTitle("Interstellar");
         movieItem2.setGenreList(Arrays.asList(Genre.ROMANCE, Genre.THRILLER, Genre.DRAMA));
-        movieItem1.setRating(2);
+        movieItem2.setRating(2);
         movieItemRepository.save(movieItem2);
 
         MovieItem movieItem3 = new MovieItem();
         movieItem3.setTitle("Redemption");
-        movieItem2.setGenreList(Arrays.asList(Genre.ACTION, Genre.ROMANCE, Genre.DRAMA));
-        movieItem1.setRating(4);
+        movieItem3.setGenreList(Arrays.asList(Genre.ACTION, Genre.ROMANCE, Genre.DRAMA));
+        movieItem3.setRating(4);
         movieItemRepository.save(movieItem3);
     }
 

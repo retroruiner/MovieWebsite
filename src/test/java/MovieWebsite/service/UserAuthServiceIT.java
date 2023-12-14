@@ -59,6 +59,8 @@ public class UserAuthServiceIT {
         // Ensure that no user is logged in and no authentication token is generated
         UserAccount user = userRepository.findByNickname(testUser.getNickname());
         assertFalse(Objects.equals(user.getPassword(), "incorrectPassword"));
+        assertFalse(user.isLoggedIn());
+        assertNull(user.getAuthToken());
     }
 
     @Test

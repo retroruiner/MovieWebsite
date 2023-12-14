@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+//Filter movies by categories
 @Service
 @RequiredArgsConstructor
 public class FilterService {

@@ -42,6 +42,7 @@ public class UserAuthService {
         }
     }
 
+    //Changes login status of user
     private void updateUserStatus(UserAccount userAccount, String authToken, boolean status) {
         userAccount.setAuthToken(authToken);
         userAccount.setLoggedIn(status);

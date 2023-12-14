@@ -41,7 +41,7 @@ public class MovieItemServiceTest {
     UserRepository userRepository;
 
     @Test
-    public void testUpdateRating() {
+    public void testAddRating() {
         MovieItem movieItem = generateMovieItem();
         UserAccount userAccount = generateUserAccount();
 
@@ -66,7 +66,7 @@ public class MovieItemServiceTest {
     public void testAddMovie() {
         MovieItem movieItem = generateMovieItem();
 
-        Mockito.when(movieItemRepository.save(Mockito.any(MovieItem.class))).thenReturn(movieItem); //TODO: check Mockito
+        Mockito.when(movieItemRepository.save(Mockito.any(MovieItem.class))).thenReturn(movieItem);
 
         movieItemService.addMovie(movieItem);
 

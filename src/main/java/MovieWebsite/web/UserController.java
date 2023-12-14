@@ -33,11 +33,11 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginUser(@RequestBody UserAccountDto userAccountDto) {
+    public ResponseEntity<LoginResponseDto> loginUser(@RequestBody UserAccountDto userAccountDto) {
         String authToken = userAuthService.loginUser(userAccountDto.getNickname(), userAccountDto.getPassword());
         UserAccount user = userRepository.findByNickname(userAccountDto.getNickname());
 
-        LoginResponse response = new LoginResponse(authToken, user.getId());
+        LoginResponseDto response = new LoginResponseDto(authToken, user.getId());
 
         return ResponseEntity.ok(response);
     }

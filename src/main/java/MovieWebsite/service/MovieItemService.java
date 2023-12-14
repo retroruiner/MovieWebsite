@@ -24,6 +24,7 @@ public class MovieItemService {
     private final MovieItemRepository movieItemRepository;
     private final UserRepository userRepository;
 
+    //Adds movie to collection
     @Transactional
     public MovieItem addMovie(MovieItem movieItem) {
         if(isMovieExistent(movieItem.getTitle())) {
@@ -36,6 +37,7 @@ public class MovieItemService {
         return movieItemRepository.findByTitle(movieName).isPresent();
     }
 
+    //Recalculates rating when new one added
     @Transactional
     public float addRating(int movieId, String authToken, float rating) {
         MovieItem movieItem = fetchMovie(movieId);
@@ -66,6 +68,7 @@ public class MovieItemService {
         return (previousRating * numVotes + newRating) / (++numVotes);
     }
 
+    // Finds user by authentication to
     private UserAccount fetchUser(String authToken) {
         UserAccount user = userRepository.findByAuthToken(authToken);
         if(user == null) {
@@ -74,6 +77,7 @@ public class MovieItemService {
         return user;
     }
 
+    //finds movie by id
     private MovieItem fetchMovie(int movieID) {
         Optional<MovieItem> movieItemOptional = movieItemRepository.findById(movieID);
         return movieItemOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Movie does not exist"));
