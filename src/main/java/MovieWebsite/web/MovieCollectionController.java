@@ -1,12 +1,8 @@
 package MovieWebsite.web;
 
 import MovieWebsite.MovieCollectionMapper;
-import MovieWebsite.UserAccountMapper;
 import MovieWebsite.dto.MovieCollectionDto;
 import MovieWebsite.dto.NewCollectionDataDto;
-import MovieWebsite.dto.RatingUpdateRequestDto;
-import MovieWebsite.dto.UserAccountDto;
-import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.MovieCollectionRepository;
 import MovieWebsite.service.MovieCollectionService;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +18,6 @@ import java.util.List;
 public class MovieCollectionController {
     private final MovieCollectionRepository movieCollectionRepository;
     private final MovieCollectionMapper movieCollectionMapper;
-    private final UserAccountMapper userAccountMapper;
     private final MovieCollectionService movieCollectionService;
 
     @PostMapping("/createCollection")

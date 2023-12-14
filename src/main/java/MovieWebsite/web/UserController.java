@@ -1,10 +1,8 @@
 package MovieWebsite.web;
 
 import MovieWebsite.UserAccountMapper;
-import MovieWebsite.dto.MovieCollectionDto;
+import MovieWebsite.dto.LoginResponseDto;
 import MovieWebsite.dto.UserAccountDto;
-import MovieWebsite.model.LoginResponse;
-import MovieWebsite.model.MovieCollection;
 import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.UserRepository;
 import MovieWebsite.service.UserAuthService;
@@ -14,11 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
@@ -37,20 +31,13 @@ public class UserController {
         );
     }
 
-//    @PostMapping("/login")
-//    public ResponseEntity<String> loginUser(@RequestBody UserAccountDto userAccountDto) {
-//        String authToken = userAuthService.loginUser(userAccountDto.getNickname(), userAccountDto.getPassword());
-//        return ResponseEntity.ok(authToken);
-//    }
-
-
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> loginUser(@RequestBody UserAccountDto userAccountDto) {
+    public ResponseEntity<LoginResponseDto> loginUser(@RequestBody UserAccountDto userAccountDto) {
         String authToken = userAuthService.loginUser(userAccountDto.getNickname(), userAccountDto.getPassword());
         UserAccount user = userRepository.findByNickname(userAccountDto.getNickname());
 
-        LoginResponse response = new LoginResponse(authToken, user.getId());
+        LoginResponseDto response = new LoginResponseDto(authToken, user.getId());
 
         return ResponseEntity.ok(response);
     }
@@ -95,11 +82,4 @@ public class UserController {
         return userAccountMapper.userToDto(userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
-
-//    @GetMapping("/{id}/listOfCollections")
-//    public List<MovieCollectionDto> findUserCollections(@RequestBody UserAccountDto userAccountDto) {
-//
-//        return userAccountMapper.usersToDtos(userRepository.getMo());
-//    }
-
 }

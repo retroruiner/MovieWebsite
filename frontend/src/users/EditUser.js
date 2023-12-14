@@ -17,6 +17,15 @@ export default function EditUser() {
 
     const { fullName, nickname, email, dateOfBirth, password } = user
 
+    const dob = new Date(user.dateOfBirth);
+    let formattedDob;
+
+    if (!isNaN(dob.getTime())) {
+        formattedDob = dob.toISOString().substring(0, 10);
+    } else {
+        formattedDob = null;
+    }
+
     const onInputChange = (e) => {
         setUser({ ...user, [e.target.name]: e.target.value }); //keep on adding the user in state
     };
@@ -92,9 +101,10 @@ export default function EditUser() {
                             <input
                                 type="date"
                                 className="form-control"
-                                placeholder="Enter your date of birth"
+                                placeholder="You cannot edit date of birth"
                                 name="dateOfBirth"
-                                value={dateOfBirth}
+                                value={formattedDob}
+                                readOnly = {true}
                                 onChange={(e) => onInputChange(e)}
                             />
                         </div>

@@ -1,26 +1,19 @@
 package MovieWebsite.web;
 
-import MovieWebsite.GenreMapper;
 import MovieWebsite.MovieItemMapper;
-import MovieWebsite.UserAccountMapper;
-import MovieWebsite.dto.GenreDto;
 import MovieWebsite.dto.MovieItemDto;
 import MovieWebsite.dto.RatingUpdateRequestDto;
-import MovieWebsite.dto.UserAccountDto;
 import MovieWebsite.model.Genre;
-import MovieWebsite.model.MovieItem;
 import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.service.FilterService;
 import MovieWebsite.service.MovieItemService;
 import MovieWebsite.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -29,10 +22,8 @@ public class MovieItemController {
     private final MovieItemMapper movieItemMapper;
     private final MovieItemRepository movieItemRepository;
     private final MovieItemService movieItemService;
-    private final UserAccountMapper userAccountMapper;
     private final SearchService searchService;
     private final FilterService filterService;
-    private final GenreMapper genreMapper;
 
     @PostMapping("/create")
     public MovieItemDto create(@RequestBody MovieItemDto movieItem) {

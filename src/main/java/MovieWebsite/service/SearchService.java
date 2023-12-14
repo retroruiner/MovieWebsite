@@ -5,7 +5,6 @@ import MovieWebsite.repository.MovieItemRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,23 +15,12 @@ public class SearchService {
 
     @Transactional
     public List<MovieItem> simpleSearch(String searchTerm) {
-//        List<MovieItem> movieItemList = new ArrayList<>();
-        List<MovieItem> movieItemList = movieItemRepository.findByTitleContainingIgnoreCase(searchTerm);
-//        for (MovieItem movieItem : ) {
-//            movieItemList.add(movieItem);
-//        }
-
-//        for (MovieItem movieItem : movieItemList) {
-//            System.out.println(movieItem.is);
-//        }
-        System.out.println(movieItemList.isEmpty());
-        return movieItemList;
+        return movieItemRepository.findByTitleContainingIgnoreCase(searchTerm);
     }
 
     @Transactional
     public List<MovieItem> advancedSearch(String searchTerm) {
         List<MovieItem> allMovies = movieItemRepository.findAll();
-
         List<MovieItem> result = new ArrayList<>();
         for (MovieItem movie : allMovies) {
             if (levenshteinDistance(searchTerm.toLowerCase(), movie.getTitle().toLowerCase()) <= getThreshold(movie.getTitle())) {
@@ -48,20 +36,15 @@ public class SearchService {
     }
 
     private static int dist( char[] s1, char[] s2 ) {
-
         // memoize only previous line of distance matrix
         int[] prev = new int[ s2.length + 1 ];
-
         for( int j = 0; j < s2.length + 1; j++ ) {
             prev[ j ] = j;
         }
-
         for( int i = 1; i < s1.length + 1; i++ ) {
-
             // calculate current line of distance matrix
             int[] curr = new int[ s2.length + 1 ];
             curr[0] = i;
-
             for( int j = 1; j < s2.length + 1; j++ ) {
                 int d1 = prev[ j ] + 1;
                 int d2 = curr[ j - 1 ] + 1;
@@ -71,7 +54,6 @@ public class SearchService {
                 }
                 curr[ j ] = Math.min( Math.min( d1, d2 ), d3 );
             }
-
             // define current line of distance matrix as previous
             prev = curr;
         }

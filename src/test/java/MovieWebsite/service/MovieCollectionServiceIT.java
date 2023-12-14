@@ -10,7 +10,6 @@ import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,7 +52,7 @@ public class MovieCollectionServiceIT {
         movieCollectionRepository.save(movieCollection);
 
         //add
-        movieCollectionService.addMovieToCollection(userAccount.getAuthToken(), movieItem.getTitle(), movieCollection.getName());
+        movieCollectionService.addMovieToCollection(userAccount.getAuthToken(), movieItem.getId(), movieCollection.getName());
 
         MovieCollection collectionWithMovie = movieCollectionRepository.findByNameAndUserAccount(movieCollection.getName(), userAccount)
                 .orElseThrow(() -> new RuntimeException("Collection not found"));
@@ -64,7 +63,7 @@ public class MovieCollectionServiceIT {
 
 
         //remove
-        movieCollectionService.removeMovieFromCollection(userAccount.getAuthToken(), movieItem.getTitle(), movieCollection.getName());
+        movieCollectionService.removeMovieFromCollection(userAccount.getAuthToken(), movieItem.getId(), movieCollection.getName());
 
         // Verify that the movie is not in the collection anymore
         MovieCollection collectionWithoutMovie = movieCollectionRepository.findByNameAndUserAccount(movieCollection.getName(), userAccount)
@@ -87,7 +86,7 @@ public class MovieCollectionServiceIT {
         //Testing with non-empty collection
         MovieItem movieItem = generateMovieItem();
         movieItemRepository.save(movieItem);
-        movieCollectionService.addMovieToCollection(userAccount.getAuthToken(), movieItem.getTitle(), "Test New Collection");
+        movieCollectionService.addMovieToCollection(userAccount.getAuthToken(), movieItem.getId(), "Test New Collection");
 
         //Delete
         movieCollectionService.deleteCollection(userAccount.getAuthToken(), "Test New Collection");
@@ -116,7 +115,8 @@ public class MovieCollectionServiceIT {
 
     private MovieItem generateMovieItem() {
         List<Genre> genreList = Arrays.asList(Genre.ACTION, Genre.COMEDY, Genre.DRAMA);
-        MovieItem movieItem = MovieItem.builder()
+
+        return MovieItem.builder()
                 .duration(23)
                 .rating(2)
                 .title("Love")
@@ -125,7 +125,5 @@ public class MovieCollectionServiceIT {
                 .releaseDate(java.sql.Date.valueOf("2009-01-09"))
                 .genreList(genreList)
                 .build();
-
-        return movieItem;
     }
 }

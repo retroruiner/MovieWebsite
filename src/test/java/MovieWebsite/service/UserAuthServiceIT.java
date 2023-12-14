@@ -4,12 +4,9 @@ import MovieWebsite.model.UserAccount;
 import MovieWebsite.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Objects;
@@ -59,6 +56,8 @@ public class UserAuthServiceIT {
         // Ensure that no user is logged in and no authentication token is generated
         UserAccount user = userRepository.findByNickname(testUser.getNickname());
         assertFalse(Objects.equals(user.getPassword(), "incorrectPassword"));
+        assertFalse(user.isLoggedIn());
+        assertNull(user.getAuthToken());
     }
 
     @Test
