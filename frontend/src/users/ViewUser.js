@@ -31,6 +31,8 @@ export default function ViewUser() {
   };
 
   const dob = new Date(user.dateOfBirth);
+
+  if (!isNaN(dob.getTime())) {
   const formattedDob = dob.toISOString().substring(0, 10);
 
   return (
@@ -73,4 +75,4 @@ export default function ViewUser() {
       </div>
     </div>
   );
-}
+}}

@@ -3,7 +3,6 @@ package MovieWebsite.service;
 import MovieWebsite.model.Genre;
 import MovieWebsite.model.MovieItem;
 import MovieWebsite.repository.MovieItemRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

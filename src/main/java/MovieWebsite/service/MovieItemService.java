@@ -2,17 +2,14 @@ package MovieWebsite.service;
 
 
 import MovieWebsite.model.Genre;
-import MovieWebsite.model.MovieCollection;
 import MovieWebsite.model.MovieItem;
 import MovieWebsite.model.UserAccount;
-import MovieWebsite.repository.MovieCollectionRepository;
 import MovieWebsite.repository.MovieItemRepository;
 import MovieWebsite.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -25,8 +22,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MovieItemService {
     private final MovieItemRepository movieItemRepository;
-    private final MovieCollectionRepository movieCollectionRepository;
-    private final MovieCollectionService movieCollectionService;
     private final UserRepository userRepository;
 
     @Transactional
@@ -34,7 +29,6 @@ public class MovieItemService {
         if(isMovieExistent(movieItem.getTitle())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Movie " + movieItem.getTitle() + " already exist");
         }
-        System.out.println(movieItem.getImage());
         return movieItemRepository.save(movieItem);
     }
 
@@ -46,7 +40,7 @@ public class MovieItemService {
     public float addRating(int movieId, String authToken, float rating) {
         MovieItem movieItem = fetchMovie(movieId);
         UserAccount userAccount = fetchUser(authToken);
-        if(!userAccount.getRatedMovies().contains(movieItem)) {
+        if(!userAccount.getRatedMovies().contains(movieItem)) { // Check if user already rated this movie
             float newRating = calculateRating(movieItem.getRating(), movieItem.getNumOfUsersVoted(), rating);
             updateMovieRating(movieItem, newRating);
             addUserRatedMovie(userAccount, movieItem);
@@ -67,6 +61,7 @@ public class MovieItemService {
         userRepository.save(userAccount);
     }
 
+    // Calculates new average rating of a movie
     private float calculateRating(float previousRating, int numVotes, float newRating) {
         return (previousRating * numVotes + newRating) / (++numVotes);
     }
